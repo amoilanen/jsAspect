@@ -19,17 +19,20 @@
 (function(host) {
     
     var jsAspect = {
-        pointcuts: {},
-        advices: {}
-    };
+            pointcuts: {},
+            advices: {}
+        },
+        aspectEnhancedFlagName = "__aspect_enhanced",
+        allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
+        allPointcuts = ["self", "prototype"];
     
-    ["self", "prototype"].forEach(function (pointcut) {
+    allAdvices.forEach(function (advice) {
+        jsAspect.advices[advice] = "__" + advice;
+    });
+    allPointcuts.forEach(function (pointcut) {
         jsAspect.pointcuts[pointcut] = pointcut;
     });
-    ["before", "after", "after-throwing", "after-returning", "around"].forEach(function (advice) {
-        jsAspect.advices[advice] = advice;
-    });
-    
+
     jsAspect.introduce = function (target, pointcut, introduction) {
         target = (jsAspect.pointcuts.self == pointcut) ? target : target.prototype;
         for (var property in introduction) {
@@ -39,37 +42,40 @@
         }
     };
 
-    //TODO: Re-factor this to use chains of methods that are stored in local fields?
-    //Defining a lot of closures can be time consuming and inefficient
     jsAspect.inject = function (target, pointcut, advice, aspect) {
-        if (advice == jsAspect.advices.before) {
-            advice = "__" + advice;
-            
-            for (var method in target.prototype) {
-                if (target.prototype.hasOwnProperty(method) 
-                        && isFunction(target.prototype[method])) {
-                    
-                    //Function is redefined only once, aspects are put into the list associated with the join point
-                    if (undefined == target.prototype[method][advice]) {
-                        (function(oldMethod) {
-                            target.prototype[method] = function() {
-                                var self = this,
-                                    args = [].slice.call(arguments, 0);
 
-                                target.prototype[method][advice].forEach(function (asp) {                                    
-                                    asp.apply(self, args);
-                                });
-                                return oldMethod.apply(this, args);
-                            };
-                        })(target.prototype[method]);
-                        
-                        target.prototype[method][advice] = [];
-                    };
-                    target.prototype[method][advice].push(aspect);
-                }
-            };
+         //TODO: Implement support for other pointcuts, only "prototype" supported so far     
+         for (var method in target.prototype) {
+             if (target.prototype.hasOwnProperty(method) && isFunction(target.prototype[method])) {
+                 enhanceWithAspects(target.prototype, method);
+                 
+                 console.log("target.prototype = ", target.prototype);
+                 
+                 target.prototype[method][advice].push(aspect);
+             }
+         };
+    };
+    
+    function enhanceWithAspects(target, methodName) {
+        var oldMethod = target[methodName];
+
+        if (!target[methodName][aspectEnhancedFlagName]) {
+
+           //TODO: Implement support for all the remaining advices  
+           target[methodName] = function() {
+               var self = this,
+                   args = [].slice.call(arguments, 0);
+
+               target[methodName][jsAspect.advices.before].forEach(function (asp) {                                    
+                   asp.apply(self, args);
+               });
+               return oldMethod.apply(this, args);
+           };
+           allAdvices.forEach(function (advice) {           
+               target[methodName][jsAspect.advices[advice]] = [];
+           });           
+           target[methodName][aspectEnhancedFlagName] = true;
         };
-        //TODO: Implement support for all the pointcuts and advices        
     };
     
     function isFunction(obj) {
