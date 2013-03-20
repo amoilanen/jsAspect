@@ -9,6 +9,7 @@
 //-caching
 
 //TODO: Add error handling
+//TODO: Add an example of an aspect itself having an aspect injected to the tests
 
 //TODO: Add documentation to the implemented methods
 
