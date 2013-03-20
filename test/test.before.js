@@ -107,12 +107,34 @@ module("jsAspect.before");
         equal(obj.method1("arg1", "arg2"), "method1value", "method1 was called as expected and returned the correct value");
         deepEqual(obj.accumulated, [], "Pointcut was executed before the method: the array is empty");
     });
-
-    function _test(){
-    };
     
-    _test("jsAspect.inject 'before' advice, 'self' pointcut", function() {
-        //TODO: Implement
-        equal(1, 1, "Dummy assert");
+    test("jsAspect.inject 'before' advice, 'self' pointcut", function() {
+        function Object() {
+        };
+        
+        //Should not be enhanced with an aspect
+        Object.prototype.method1 = function() {
+            return "method1value";
+        };
+        
+        var obj = new Object();
+        
+        //Will be enhanced with an aspect
+        obj.method2 = function() {
+            return "method2value";
+        };
+
+        jsAspect.inject(obj, jsAspect.pointcuts.self, jsAspect.advices.before,
+            function() {
+                var args = [].slice.call(arguments, 0);
+            
+                this.accumulated = this.accumulated || [];
+                this.accumulated.push(args);
+            }
+        );
+        
+        equal(obj.method1("arg1", "arg2"), "method1value", "method1 was called as expected and returned the correct value");
+        equal(obj.method2("arg3", "arg4", "arg5"), "method2value", "method2 was called as expected and returned the correct value");
+        deepEqual(obj.accumulated, [["arg3", "arg4", "arg5"]], "Pointcut was executed before the object method but not before the prototype method");
     });
 })();

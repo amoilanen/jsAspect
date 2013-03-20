@@ -43,15 +43,11 @@
     };
 
     jsAspect.inject = function (target, pointcut, advice, aspect) {
-
-         //TODO: Implement support for other pointcuts, only "prototype" supported so far     
-         for (var method in target.prototype) {
-             if (target.prototype.hasOwnProperty(method) && isFunction(target.prototype[method])) {
-                 enhanceWithAspects(target.prototype, method);
-                 
-                 console.log("target.prototype = ", target.prototype);
-                 
-                 target.prototype[method][advice].push(aspect);
+         target = (jsAspect.pointcuts.prototype == pointcut) ? target.prototype : target;         
+         for (var method in target) {
+             if (target.hasOwnProperty(method) && isFunction(target[method])) {
+                 enhanceWithAspects(target, method);                 
+                 target[method][advice].push(aspect);
              }
          };
     };
