@@ -86,17 +86,27 @@
            //TODO: Implement support for all the remaining advices 
            target[methodName] = function() {
                var self = this,
+                   afterAspects = target[methodName][jsAspect.advices.after],
                    beforeAspects = target[methodName][jsAspect.advices.before],
-                   aroundAspects = target[methodName][jsAspect.advices.around].slice(0, target[methodName][jsAspect.advices.around].length),
+                   aroundAspects = target[methodName][jsAspect.advices.around]
+                           .slice(0, target[methodName][jsAspect.advices.around].length),
                    firstAroundAspect = aroundAspects.shift(),
-                   args = [].slice.call(arguments, 0);
+                   args = [].slice.call(arguments, 0),
+                   argsForAroundAspectsChain = [].slice.call(arguments, 0),
+                   returnValue = undefined;
 
                beforeAspects.forEach(function (asp) {                                    
                    asp.apply(self, args);
                });
-               
-               args.unshift(aroundAspects);
-               return firstAroundAspect.apply(this, args);               
+
+               argsForAroundAspectsChain.unshift(aroundAspects);
+               returnValue = firstAroundAspect.apply(this, argsForAroundAspectsChain);
+
+               afterAspects.forEach(function (asp) {                                    
+                   asp.apply(self, args);
+               });
+
+               return returnValue;              
            };
            allAdvices.forEach(function (advice) {           
                target[methodName][jsAspect.advices[advice]] = [];

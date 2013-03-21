@@ -1,6 +1,7 @@
 require([
     "../src/aspect.js",
+    "./test.after.js",
     "./test.around.js",
-    "./test.introduce.js",
-    "./test.before.js"
+    "./test.before.js",
+    "./test.introduce.js"
 ]);
