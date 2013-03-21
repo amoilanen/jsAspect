@@ -20,7 +20,7 @@
         },
         aspectEnhancedFlagName = "__aspect_enhanced",
         allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
-        allPointcuts = ["methods", "prototypeMethods"];
+        allPointcuts = ["methods", "prototypeMethods", "method"];
     
     allAdvices.forEach(function (advice) {
         jsAspect.advices[advice] = "__" + advice;
@@ -37,21 +37,32 @@
             }
         }
     };
-
-    jsAspect.inject = function (target, pointcut, advice, aspect) {
-         var originalAdvice = advice;
-        
-         target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
+    
+    /**
+     * 'methodName' makes sense only for the 'method' pointcut, optional parameter
+     */
+    jsAspect.inject = function (target, pointcut, advice, aspect, methodName) {                 
+         if (jsAspect.pointcuts.method == pointcut) {
+             injectAspect(target, methodName, aspect, advice);
+         } else {
+             target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
          
-         if (jsAspect.advices.around == advice) {
-             aspect = wrapAroundAspect(aspect);
+             if (jsAspect.advices.around == advice) {
+                 aspect = wrapAroundAspect(aspect);
+             };
+             for (var method in target) {
+                 if (target.hasOwnProperty(method)) {
+                     injectAspect(target, method, aspect, advice);
+                 }
+             };
          };
-         for (var method in target) {
-             if (target.hasOwnProperty(method) && isFunction(target[method])) {
-                 enhanceWithAspects(target, method);                 
-                 target[method][advice].unshift(aspect);
-             }
-         };
+    };
+    
+    function injectAspect(target, methodName, aspect, advice) {
+        if (isFunction(target[methodName])) {        
+            enhanceWithAspects(target, methodName);                 
+            target[methodName][advice].unshift(aspect);
+        }
     };
     
     function wrapAroundAspect(aspect) {
