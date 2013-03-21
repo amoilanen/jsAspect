@@ -2,7 +2,7 @@ module("jsAspect.around");
 
 (function() {
     
-    test("jsAspect.inject: 'around' advice, 'prototype' pointcut", function() {
+    test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         };
         
@@ -14,7 +14,7 @@ module("jsAspect.around");
             return x - 1;
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.around,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
             function aroundCallback(func, x) {
                 return 2 * func(x);
             }
@@ -26,7 +26,7 @@ module("jsAspect.around");
         equal(obj.minusOne(3), 4, "'around' advice has been applied to 'minusOne'");
     });
 
-    test("jsAspect.inject: 'around' advice, 'prototype' pointcut, multiple arguments in the method", function() {
+    test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut, multiple arguments in the method", function() {
         function Object() {
         };
         
@@ -38,7 +38,7 @@ module("jsAspect.around");
             });;
         };
 
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.around,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
             function aroundCallback(func) {
                 var args = [].slice.call(arguments, 1),
                     sum = func.apply(this, args);
@@ -53,7 +53,7 @@ module("jsAspect.around");
         equal(obj.sum(1, 2, 3, 4, 5), 15, "'around' advice has been applied to 'sum'");
     });
     
-    test("jsAspect.inject: 'around' advice, 'prototype' pointcut: 'this' has the correct value", function() {
+    test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut: 'this' has the correct value", function() {
         var obj = new Object();
 
         function Object() {
@@ -69,19 +69,19 @@ module("jsAspect.around");
             return x - 1;
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.around,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
             function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 1");
                 return 2 * func(x);
             }
         );
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.around,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
             function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 2");
                 return 3 * func(x);
             }
         );
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.around,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
                function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 3");
                 return 4 * func(x);
@@ -106,7 +106,7 @@ module("jsAspect.around");
             return 2 * x;
         };
         
-        jsAspect.inject(obj, jsAspect.pointcuts.self, jsAspect.advices.around,
+        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.around,
             function aroundCallback(func, x) {
                 return func(x) - 1;
             }

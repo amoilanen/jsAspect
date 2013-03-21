@@ -2,7 +2,7 @@ module("jsAspect.after");
 
 (function() {
     
-    test("jsAspect.inject: 'after' advice, 'prototype' pointcut", function() {
+    test("jsAspect.inject: 'after' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         };
         
@@ -14,7 +14,7 @@ module("jsAspect.after");
             return "method2value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
             function afterCallback() {
                 var args = [].slice.call(arguments, 0);
 
@@ -30,13 +30,13 @@ module("jsAspect.after");
         deepEqual(obj.afterCallbackArgs, [["arg1", "arg2"], ["arg3", "arg4", "arg5"]], "'after' advice was called as expected with correct 'this'");
     });
 
-    test("jsAspect.inject: 'after' advice, 'prototype' pointcut, object contains fields other than functions, they are left intact", function() {
+    test("jsAspect.inject: 'after' advice, 'prototypeMethods' pointcut, object contains fields other than functions, they are left intact", function() {
         function Object() {
         };
 
         Object.prototype.field1 = "field1value";
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
             function afterCallback() {
             }
         );
@@ -46,7 +46,7 @@ module("jsAspect.after");
         equal(obj.field1, "field1value", "fields are not affected")
     });
     
-    test("jsAspect.inject: multiple 'after' advices, 'prototype' pointcut", function() {
+    test("jsAspect.inject: multiple 'after' advices, 'prototypeMethods' pointcut", function() {
         var adviceNames = ["advice1", "advice2", "advice3", "advice4", "advice5"];
         
         function Object() {
@@ -62,7 +62,7 @@ module("jsAspect.after");
         
         adviceNames.forEach(function(adviceName) {
             (function (adviceName) {
-                jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.after,
+                jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
                     function() {
                         var args = [].slice.call(arguments, 0);
 
@@ -93,7 +93,7 @@ module("jsAspect.after");
             return "method1value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototype, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
             function() {
                 var args = [].slice.call(arguments, 0);
             
@@ -108,7 +108,7 @@ module("jsAspect.after");
         deepEqual(obj.accumulated, [["arg1", "arg2"]], "Pointcut was executed after the method: the array is empty");
     });
     
-    test("jsAspect.inject 'after' advice, 'self' pointcut", function() {
+    test("jsAspect.inject 'after' advice, 'methods' pointcut", function() {
         function Object() {
         };
         
@@ -124,7 +124,7 @@ module("jsAspect.after");
             return "method2value";
         };
 
-        jsAspect.inject(obj, jsAspect.pointcuts.self, jsAspect.advices.after,
+        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.after,
             function() {
                 var args = [].slice.call(arguments, 0);
             

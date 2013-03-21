@@ -20,7 +20,7 @@
         },
         aspectEnhancedFlagName = "__aspect_enhanced",
         allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
-        allPointcuts = ["self", "prototype"];
+        allPointcuts = ["methods", "prototypeMethods"];
     
     allAdvices.forEach(function (advice) {
         jsAspect.advices[advice] = "__" + advice;
@@ -30,7 +30,7 @@
     });
 
     jsAspect.introduce = function (target, pointcut, introduction) {
-        target = (jsAspect.pointcuts.self == pointcut) ? target : target.prototype;
+        target = (jsAspect.pointcuts.methods == pointcut) ? target : target.prototype;
         for (var property in introduction) {
             if (introduction.hasOwnProperty(property)) {
                 target[property] = introduction[property];
@@ -41,7 +41,7 @@
     jsAspect.inject = function (target, pointcut, advice, aspect) {
          var originalAdvice = advice;
         
-         target = (jsAspect.pointcuts.prototype == pointcut) ? target.prototype : target;
+         target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
          
          if (jsAspect.advices.around == advice) {
              aspect = wrapAroundAspect(aspect);
