@@ -12,10 +12,6 @@
 //TODO: Add an example of an aspect itself having an aspect injected to the tests
 
 //TODO: Add documentation to the implemented methods
-
-//TODO: Enable injecting aspects both to the prototype and to the function itself
-//Two types of pointcuts are supported: "prototype" and "function", depending on that
-//different behavior changes will be applied
 (function(host) {
     
     var jsAspect = {
@@ -59,24 +55,24 @@
     };
     
     function wrapAroundAspect(aspect) {
-        var oldAspect = aspect;
-        
-        var wrappedAspect = function (leftAroundAspects) {
-            var oThis = this,
-                nextWrappedAspect = leftAroundAspects.shift(),
-                args = [].slice.call(arguments, 1);
+        var oldAspect = aspect,
+            wrappedAspect = function (leftAroundAspects) {
+                var oThis = this,
+                    nextWrappedAspect = leftAroundAspects.shift(),
+                    args = [].slice.call(arguments, 1);
 
-            if (nextWrappedAspect) {
-                var nextUnwrappedAspect = function() {
-                    var argsForWrapped = [].slice.call(arguments, 0);
+                if (nextWrappedAspect) {
+                    var nextUnwrappedAspect = function() {
+                        var argsForWrapped = [].slice.call(arguments, 0);
                 
-                    argsForWrapped.unshift(leftAroundAspects);
-                    return nextWrappedAspect.apply(oThis, argsForWrapped);
+                        argsForWrapped.unshift(leftAroundAspects);
+                        return nextWrappedAspect.apply(oThis, argsForWrapped);
+                    };
+                    args.unshift(nextUnwrappedAspect);
                 };
-                args.unshift(nextUnwrappedAspect);
+                return oldAspect.apply(this, args);
             };
-            return oldAspect.apply(this, args);
-        };
+
         //Can be useful for debugging
         wrappedAspect.__originalAspect = oldAspect;
         return wrappedAspect;
@@ -87,24 +83,20 @@
 
         if (!target[methodName][aspectEnhancedFlagName]) {
 
-           //TODO: Implement support for all the remaining advices  
+           //TODO: Implement support for all the remaining advices 
            target[methodName] = function() {
                var self = this,
+                   beforeAspects = target[methodName][jsAspect.advices.before],
+                   aroundAspects = target[methodName][jsAspect.advices.around].slice(0, target[methodName][jsAspect.advices.around].length),
+                   firstAroundAspect = aroundAspects.shift(),
                    args = [].slice.call(arguments, 0);
 
-               target[methodName][jsAspect.advices.before].forEach(function (asp) {                                    
+               beforeAspects.forEach(function (asp) {                                    
                    asp.apply(self, args);
                });
-
-               //TODO: Re-factor
-               var aroundAspects = target[methodName][jsAspect.advices.around].slice(0, target[methodName][jsAspect.advices.around].length);
+               
                args.unshift(aroundAspects);
-
-               var firstAroundAspect = aroundAspects.shift();
-               
-               return firstAroundAspect.apply(this, args);
-               
-               //return oldMethod.apply(this, args);
+               return firstAroundAspect.apply(this, args);               
            };
            allAdvices.forEach(function (advice) {           
                target[methodName][jsAspect.advices[advice]] = [];
