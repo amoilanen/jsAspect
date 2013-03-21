@@ -43,13 +43,43 @@
     };
 
     jsAspect.inject = function (target, pointcut, advice, aspect) {
-         target = (jsAspect.pointcuts.prototype == pointcut) ? target.prototype : target;         
+         var originalAdvice = advice;
+        
+         target = (jsAspect.pointcuts.prototype == pointcut) ? target.prototype : target;
+         
+         if (jsAspect.advices.around == advice) {
+             aspect = wrapAroundAspect(aspect);
+         };
          for (var method in target) {
              if (target.hasOwnProperty(method) && isFunction(target[method])) {
                  enhanceWithAspects(target, method);                 
-                 target[method][advice].push(aspect);
+                 target[method][advice].unshift(aspect);
              }
          };
+    };
+    
+    function wrapAroundAspect(aspect) {
+        var oldAspect = aspect;
+        
+        var wrappedAspect = function (leftAroundAspects) {
+            var oThis = this,
+                nextWrappedAspect = leftAroundAspects.shift(),
+                args = [].slice.call(arguments, 1);
+
+            if (nextWrappedAspect) {
+                var nextUnwrappedAspect = function() {
+                    var argsForWrapped = [].slice.call(arguments, 0);
+                
+                    argsForWrapped.unshift(leftAroundAspects);
+                    return nextWrappedAspect.apply(oThis, argsForWrapped);
+                };
+                args.unshift(nextUnwrappedAspect);
+            };
+            return oldAspect.apply(this, args);
+        };
+        //Can be useful for debugging
+        wrappedAspect.__originalAspect = oldAspect;
+        return wrappedAspect;
     };
     
     function enhanceWithAspects(target, methodName) {
@@ -65,11 +95,21 @@
                target[methodName][jsAspect.advices.before].forEach(function (asp) {                                    
                    asp.apply(self, args);
                });
-               return oldMethod.apply(this, args);
+
+               //TODO: Re-factor
+               var aroundAspects = target[methodName][jsAspect.advices.around].slice(0, target[methodName][jsAspect.advices.around].length);
+               args.unshift(aroundAspects);
+
+               var firstAroundAspect = aroundAspects.shift();
+               
+               return firstAroundAspect.apply(this, args);
+               
+               //return oldMethod.apply(this, args);
            };
            allAdvices.forEach(function (advice) {           
                target[methodName][jsAspect.advices[advice]] = [];
-           });           
+           });
+           target[methodName][jsAspect.advices.around].unshift(wrapAroundAspect(oldMethod));
            target[methodName][aspectEnhancedFlagName] = true;
         };
     };
