@@ -2,8 +2,6 @@
 //http://www.dotvoid.com/2005/06/aspect-oriented-programming-and-javascript/
 */
 
-//TODO: Re-factor the library: use consistent naming: what is an aspect, advice, pointcut, etc.
-
 //TODO: Use Grunt to build the library
 
 //TODO: Add error handling
@@ -20,7 +18,7 @@
             pointcuts: {},
             advices: {}
         },
-        aspectEnhancedFlagName = "__aspect_enhanced",
+        adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
         allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
         allPointcuts = ["methods", "prototypeMethods", "method"];
     
@@ -43,104 +41,124 @@
     /**
      * 'methodName' makes sense only for the 'method' pointcut, optional parameter
      */
-    jsAspect.inject = function (target, pointcut, advice, aspect, methodName) {                 
+    jsAspect.inject = function (target, pointcut, adviceName, advice, methodName) {                 
          if (jsAspect.pointcuts.method == pointcut) {
-             injectAspect(target, methodName, aspect, advice);
+             injectAdvice(target, methodName, advice, adviceName);
          } else {
              target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
-         
-             if (jsAspect.advices.around == advice) {
-                 aspect = wrapAroundAspect(aspect);
-             };
              for (var method in target) {
                  if (target.hasOwnProperty(method)) {
-                     injectAspect(target, method, aspect, advice);
+                     injectAdvice(target, method, advice, adviceName);
                  }
              };
          };
     };
     
-    function injectAspect(target, methodName, aspect, advice) {
-        if (isFunction(target[methodName])) {        
-            enhanceWithAspects(target, methodName);                 
-            target[methodName][advice].unshift(aspect);
+    function injectAdvice(target, methodName, advice, adviceName) {
+        if (isFunction(target[methodName])) {
+            if (jsAspect.advices.around == adviceName) {
+                 advice = wrapAroundAdvice(advice);
+            };
+            if (!target[methodName][adviceEnhancedFlagName]) {
+                enhanceWithAdvices(target, methodName);                 
+                target[methodName][adviceEnhancedFlagName] = true;
+            };
+            target[methodName][adviceName].unshift(advice);
         }
     };
     
-    function wrapAroundAspect(aspect) {
-        var oldAspect = aspect,
-            wrappedAspect = function (leftAroundAspects) {
+    function wrapAroundAdvice(advice) {
+        var oldAdvice = advice,
+            wrappedAdvice = function (leftAroundAdvices) {
                 var oThis = this,
-                    nextWrappedAspect = leftAroundAspects.shift(),
+                    nextWrappedAdvice = leftAroundAdvices.shift(),
                     args = [].slice.call(arguments, 1);
 
-                if (nextWrappedAspect) {
-                    var nextUnwrappedAspect = function() {
+                if (nextWrappedAdvice) {
+                    var nextUnwrappedAdvice = function() {
                         var argsForWrapped = [].slice.call(arguments, 0);
                 
-                        argsForWrapped.unshift(leftAroundAspects);
-                        return nextWrappedAspect.apply(oThis, argsForWrapped);
+                        argsForWrapped.unshift(leftAroundAdvices);
+                        return nextWrappedAdvice.apply(oThis, argsForWrapped);
                     };
-                    args.unshift(nextUnwrappedAspect);
+                    args.unshift(nextUnwrappedAdvice);
                 };
-                return oldAspect.apply(this, args);
+                return oldAdvice.apply(this, args);
             };
 
         //Can be useful for debugging
-        wrappedAspect.__originalAspect = oldAspect;
-        return wrappedAspect;
+        wrappedAdvice.__originalAdvice = oldAdvice;
+        return wrappedAdvice;
     };
     
-    function enhanceWithAspects(target, methodName) {
-        var oldMethod = target[methodName];
+    function enhanceWithAdvices(target, methodName) {
+        var originalMethod = target[methodName];
 
-        //TODO: Move this check to the calling method
-        if (!target[methodName][aspectEnhancedFlagName]) {
+        target[methodName] = function() {
+            var self = this,
+                method = target[methodName],
+                args = [].slice.call(arguments, 0),
+                returnValue = undefined;
 
-           //TODO: Implement support for all the remaining advices 
-           target[methodName] = function() {
-               var self = this,
-                   afterAspects = target[methodName][jsAspect.advices.after],
-                   afterThrowingAspects = target[methodName][jsAspect.advices.afterThrowing],
-                   afterReturningAspects = target[methodName][jsAspect.advices.afterReturning],
-                   beforeAspects = target[methodName][jsAspect.advices.before],
-                   aroundAspects = target[methodName][jsAspect.advices.around]
-                           .slice(0, target[methodName][jsAspect.advices.around].length),
-                   firstAroundAspect = aroundAspects.shift(),
-                   args = [].slice.call(arguments, 0),
-                   argsForAroundAspectsChain = [].slice.call(arguments, 0),
-                   returnValue = undefined;
-
-               beforeAspects.forEach(function (asp) {                                    
-                   asp.apply(self, args);
-               });
-
-               try {
-                   argsForAroundAspectsChain.unshift(aroundAspects);
-                   returnValue = firstAroundAspect.apply(this, argsForAroundAspectsChain);
-               } catch (exception) {               
-                   afterThrowingAspects.forEach(function (asp) {
-                       asp.call(self, exception);
-                   });
-                   throw exception;
-               }
-
-               afterAspects.forEach(function (asp) {                                    
-                   asp.apply(self, args);
-               });
-
-               return afterReturningAspects.reduce(function (acc, current) {
-                  return current(acc);
-               }, returnValue);    
-           };
-           allAdvices.forEach(function (advice) {           
-               target[methodName][jsAspect.advices[advice]] = [];
-           });
-           target[methodName][jsAspect.advices.around].unshift(wrapAroundAspect(oldMethod));
-           target[methodName][aspectEnhancedFlagName] = true;
+            applyBeforeAdvices(self, method, args);
+            try {
+                returnValue = applyAroundAdvices(self, method, args);
+            } catch (exception) {             
+                applyAfterThrowingAdvices(self, method, exception);
+                throw exception;
+            };
+            applyAfterAdvices(self, method, args);
+            return applyAfterReturningAdvices(self, method, returnValue);  
         };
+        allAdvices.forEach(function (advice) {           
+            target[methodName][jsAspect.advices[advice]] = [];
+        });
+        target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
     };
     
+        
+    function applyBeforeAdvices(context, method, args) {
+        var beforeAdvices = method[jsAspect.advices.before];
+        
+        beforeAdvices.forEach(function (advice) {                                    
+            advice.apply(context, args);
+        });
+    };
+
+    function applyAroundAdvices(context, method, args) {
+        var aroundAdvices = method[jsAspect.advices.around]
+                .slice(0, method[jsAspect.advices.around].length),
+            firstAroundAdvice = aroundAdvices.shift(),
+            argsForAroundAdvicesChain = args.slice();
+        
+        argsForAroundAdvicesChain.unshift(aroundAdvices);
+        return firstAroundAdvice.apply(context, argsForAroundAdvicesChain);
+    };
+
+    function applyAfterThrowingAdvices(context, method, exception) {
+        var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
+        
+        afterThrowingAdvices.forEach(function (advice) {        
+            advice.call(context, exception);
+        });
+    };
+
+    function applyAfterAdvices(context, method, args) {
+        var afterAdvices = method[jsAspect.advices.after];
+        
+        afterAdvices.forEach(function (advice) {                                    
+            advice.apply(context, args);
+        });
+    };
+
+    function applyAfterReturningAdvices(context, method, returnValue) {
+        var afterReturningAdvices = method[jsAspect.advices.afterReturning];
+        
+        return afterReturningAdvices.reduce(function (acc, current) {
+            return current(acc);
+        }, returnValue);
+    };
+
     function isFunction(obj) {
         return obj && Object.prototype.toString.call(obj) == '[object Function]';
     }
