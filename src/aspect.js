@@ -102,6 +102,7 @@
                var self = this,
                    afterAspects = target[methodName][jsAspect.advices.after],
                    afterThrowingAspects = target[methodName][jsAspect.advices.afterThrowing],
+                   afterReturningAspects = target[methodName][jsAspect.advices.afterReturning],
                    beforeAspects = target[methodName][jsAspect.advices.before],
                    aroundAspects = target[methodName][jsAspect.advices.around]
                            .slice(0, target[methodName][jsAspect.advices.around].length),
@@ -128,7 +129,9 @@
                    asp.apply(self, args);
                });
 
-               return returnValue;              
+               return afterReturningAspects.reduce(function (acc, current) {
+                  return current(acc);
+               }, returnValue);    
            };
            allAdvices.forEach(function (advice) {           
                target[methodName][jsAspect.advices[advice]] = [];

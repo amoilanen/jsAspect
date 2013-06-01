@@ -2,6 +2,7 @@ require([
     "../src/aspect.js",
     "./test.after.js",
     "./test.afterthrowing.js",
+    "./test.afterreturning.js",
     "./test.around.js",
     "./test.before.js",
     "./test.introduce.js",

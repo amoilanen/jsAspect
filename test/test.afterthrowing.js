@@ -1,8 +1,8 @@
-module("jsAspect.before");
+module("jsAspect.afterThrowing");
 
 (function() {
     
-    test("jsAspect.inject: 'afterthrowing' advice, 'prototypeMethods' pointcut", function() {
+    test("jsAspect.inject: 'afterThrowing' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         };
         
@@ -36,7 +36,7 @@ module("jsAspect.before");
         deepEqual(obj.thrownExceptions, ["method1exception", "method2exception"], "Aspects recieve the exceptions");
     });
     
-    test("jsAspect.inject: 'afterthrowing' several advices", function() {
+    test("jsAspect.inject: 'afterThrowing' several advices", function() {
         function Object() {
         };
         
@@ -73,7 +73,7 @@ module("jsAspect.before");
         deepEqual(thrownExceptions, ["method1exception_advice2_advice1", "method2exception_advice2_advice1"], "Multiple advices are applied");
     });
 
-    test("jsAspect.inject: 'afterthrowing' advice throws an exception", function() {
+    test("jsAspect.inject: 'afterThrowing' advice throws an exception", function() {
         function Object() {
         };
         
