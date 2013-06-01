@@ -2,14 +2,16 @@
 //http://www.dotvoid.com/2005/06/aspect-oriented-programming-and-javascript/
 */
 
+//TODO: Re-factor the library: use consistent naming: what is an aspect, advice, pointcut, etc.
+
 //TODO: Use Grunt to build the library
+
+//TODO: Add error handling
+//TODO: Add an example of an aspect itself having an aspect injected to the tests
 
 //TODO: Add a couple of demos of using the library:
 //-logging
 //-caching
-
-//TODO: Add error handling
-//TODO: Add an example of an aspect itself having an aspect injected to the tests
 
 //TODO: Add documentation to the implemented methods
 (function(host) {
@@ -92,12 +94,14 @@
     function enhanceWithAspects(target, methodName) {
         var oldMethod = target[methodName];
 
+        //TODO: Move this check to the calling method
         if (!target[methodName][aspectEnhancedFlagName]) {
 
            //TODO: Implement support for all the remaining advices 
            target[methodName] = function() {
                var self = this,
                    afterAspects = target[methodName][jsAspect.advices.after],
+                   afterThrowingAspects = target[methodName][jsAspect.advices.afterThrowing],
                    beforeAspects = target[methodName][jsAspect.advices.before],
                    aroundAspects = target[methodName][jsAspect.advices.around]
                            .slice(0, target[methodName][jsAspect.advices.around].length),
@@ -110,8 +114,15 @@
                    asp.apply(self, args);
                });
 
-               argsForAroundAspectsChain.unshift(aroundAspects);
-               returnValue = firstAroundAspect.apply(this, argsForAroundAspectsChain);
+               try {
+                   argsForAroundAspectsChain.unshift(aroundAspects);
+                   returnValue = firstAroundAspect.apply(this, argsForAroundAspectsChain);
+               } catch (exception) {               
+                   afterThrowingAspects.forEach(function (asp) {
+                       asp.call(self, exception);
+                   });
+                   throw exception;
+               }
 
                afterAspects.forEach(function (asp) {                                    
                    asp.apply(self, args);

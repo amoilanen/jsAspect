@@ -63,12 +63,12 @@ module("jsAspect.before");
         adviceNames.forEach(function(adviceName) {
             (function (adviceName) {
                 jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
-                       function() {
-                           var args = [].slice.call(arguments, 0);
+                    function() {
+                        var args = [].slice.call(arguments, 0);
 
-                           this[adviceName] = this[adviceName] || [];
-                           this[adviceName].push(args);
-                       }
+                        this[adviceName] = this[adviceName] || [];
+                        this[adviceName].push(args);
+                    }
                 );
             })(adviceName);
         })

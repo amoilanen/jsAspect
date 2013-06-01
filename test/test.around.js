@@ -34,8 +34,8 @@ module("jsAspect.around");
             var args = [].slice.call(arguments, 0);
             
             return args.reduce(function(accumulated, current){
-                  return accumulated + current;
-            });;
+                return accumulated + current;
+            });
         };
 
         jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
@@ -82,14 +82,14 @@ module("jsAspect.around");
             }
         );
         jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.around,
-               function aroundCallback(func, x) {
+            function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 3");
                 return 4 * func(x);
             }
         );
 
-        obj.identity(3);
-        obj.minusOne(3)
+        equal(obj.identity(3), 72, "'around' advice has been applied to 'identity'");
+        equal(obj.minusOne(3), 48, "'around' advice has been applied to 'minusOne'");
     });
     
     test("jsAspect.inject: 'around' advice, 'self' pointcut", function() {
