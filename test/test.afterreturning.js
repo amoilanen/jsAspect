@@ -22,7 +22,7 @@ module("jsAspect.afterReturning");
         equal(obj.wrapValue(2).value, 3, "'afterReturning' advice is applied");     
     });
 
-    test("jsAspect.inject: several 'afterReturning' advices", function() {
+    test("jsAspect.inject: several 'afterReturning' aspects", function() {
         function Object() {
         };
         
@@ -30,14 +30,14 @@ module("jsAspect.afterReturning");
             return value;
         };
         
-        ["advice1", "advice2", "advice3"].forEach(function (adviceName) {
+        ["aspect1", "aspect2", "aspect3"].forEach(function (aspectName) {
             jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterReturning,
                 function afterReturningCallback(retValue) {
-                    return retValue + "_" + adviceName;
+                    return retValue + "_" + aspectName;
                 }
             );
         });
         
-        equal(new Object().identity("value"), "value_advice3_advice2_advice1", "'afterReturning' several advices re applied in the reverse order");     
+        equal(new Object().identity("value"), "value_aspect3_aspect2_aspect1", "'afterReturning' several aspects applied in the reverse order");     
     });    
 })();

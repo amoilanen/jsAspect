@@ -1,17 +1,8 @@
-/*
-//http://www.dotvoid.com/2005/06/aspect-oriented-programming-and-javascript/
-*/
-
-//TODO: Use Grunt to build the library
-
-//TODO: Add error handling
-//TODO: Add an example of an aspect itself having an aspect injected to the tests
-
-//TODO: Add a couple of demos of using the library:
-//-logging
-//-caching
-
-//TODO: Add documentation to the implemented methods
+/**
+ * Aspect Oriented framework inspired by the Danne Lundqvist's article
+ * 
+ * http://www.dotvoid.com/2005/06/aspect-oriented-programming-and-javascript/
+ */
 (function(host) {
     
     var jsAspect = {
@@ -30,7 +21,7 @@
     });
 
     jsAspect.introduce = function (target, pointcut, introduction) {
-        target = (jsAspect.pointcuts.methods == pointcut) ? target : target.prototype;
+        target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
         for (var property in introduction) {
             if (introduction.hasOwnProperty(property)) {
                 target[property] = introduction[property];

@@ -36,7 +36,7 @@ module("jsAspect.afterThrowing");
         deepEqual(obj.thrownExceptions, ["method1exception", "method2exception"], "Aspects recieve the exceptions");
     });
     
-    test("jsAspect.inject: 'afterThrowing' several advices", function() {
+    test("jsAspect.inject: 'afterThrowing' several aspects", function() {
         function Object() {
         };
         
@@ -50,12 +50,12 @@ module("jsAspect.afterThrowing");
         
         jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
             function afterThrowingCallback(exception) {
-                exception.message = exception.message + "_advice1"
+                exception.message = exception.message + "_aspect1"
             }
         );
         jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
             function afterThrowingCallback(exception) {
-                exception.message = exception.message + "_advice2"
+                exception.message = exception.message + "_aspect2"
             }
         );
 
@@ -70,7 +70,7 @@ module("jsAspect.afterThrowing");
             }
         });
         
-        deepEqual(thrownExceptions, ["method1exception_advice2_advice1", "method2exception_advice2_advice1"], "Multiple advices are applied");
+        deepEqual(thrownExceptions, ["method1exception_aspect2_aspect1", "method2exception_aspect2_aspect1"], "Multiple aspects are applied");
     });
 
     test("jsAspect.inject: 'afterThrowing' advice throws an exception", function() {
