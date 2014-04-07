@@ -32,7 +32,7 @@
     /**
      * 'methodName' makes sense only for the 'method' pointcut, optional parameter
      */
-    jsAspect.inject = function (target, pointcut, adviceName, advice, methodName) {                 
+    jsAspect.inject = function (target, pointcut, adviceName, advice, methodName) {
          if (jsAspect.pointcuts.method == pointcut) {
              injectAdvice(target, methodName, advice, adviceName);
          } else {
@@ -51,7 +51,7 @@
                  advice = wrapAroundAdvice(advice);
             };
             if (!target[methodName][adviceEnhancedFlagName]) {
-                enhanceWithAdvices(target, methodName);                 
+                enhanceWithAdvices(target, methodName);
                 target[methodName][adviceEnhancedFlagName] = true;
             };
             target[methodName][adviceName].unshift(advice);
@@ -94,14 +94,14 @@
             applyBeforeAdvices(self, method, args);
             try {
                 returnValue = applyAroundAdvices(self, method, args);
-            } catch (exception) {             
+            } catch (exception) {
                 applyAfterThrowingAdvices(self, method, exception);
                 throw exception;
             };
             applyAfterAdvices(self, method, args);
             return applyAfterReturningAdvices(self, method, returnValue);  
         };
-        allAdvices.forEach(function (advice) {           
+        allAdvices.forEach(function (advice) {
             target[methodName][jsAspect.advices[advice]] = [];
         });
         target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
@@ -111,7 +111,7 @@
     function applyBeforeAdvices(context, method, args) {
         var beforeAdvices = method[jsAspect.advices.before];
         
-        beforeAdvices.forEach(function (advice) {                                    
+        beforeAdvices.forEach(function (advice) {
             advice.apply(context, args);
         });
     };
@@ -129,7 +129,7 @@
     function applyAfterThrowingAdvices(context, method, exception) {
         var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
         
-        afterThrowingAdvices.forEach(function (advice) {        
+        afterThrowingAdvices.forEach(function (advice) {
             advice.call(context, exception);
         });
     };
@@ -137,7 +137,7 @@
     function applyAfterAdvices(context, method, args) {
         var afterAdvices = method[jsAspect.advices.after];
         
-        afterAdvices.forEach(function (advice) {                                    
+        afterAdvices.forEach(function (advice) {
             advice.apply(context, args);
         });
     };
