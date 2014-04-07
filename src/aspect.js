@@ -1,6 +1,6 @@
 /**
  * Aspect Oriented framework inspired by the Danne Lundqvist's article
- * 
+ *
  * http://www.dotvoid.com/2005/06/aspect-oriented-programming-and-javascript/
  */
 (function(host) {
@@ -56,7 +56,7 @@
       }
       target[methodName][adviceName].unshift(advice);
     }
-  };
+  }
 
   function wrapAroundAdvice(advice) {
     var oldAdvice = advice,
@@ -80,7 +80,7 @@
     //Can be useful for debugging
     wrappedAdvice.__originalAdvice = oldAdvice;
     return wrappedAdvice;
-  };
+  }
 
   function enhanceWithAdvices(target, methodName) {
     var originalMethod = target[methodName];
@@ -89,9 +89,17 @@
       var self = this,
         method = target[methodName],
         args = [].slice.call(arguments, 0),
-        returnValue = undefined;
+        returnValue = undefined,
+        joinPointContext = {
+          isStopped: false,
+          methodName: methodName,
+          stop: function() {
+            this.isStopped = true;
+          }
+        };
 
-      applyBeforeAdvices(self, method, args);
+      applyBeforeAdvices(self, method, args, joinPointContext);
+      if (joinPointContext.isStopped) return;
       try {
         returnValue = applyAroundAdvices(self, method, args);
       } catch (exception) {
@@ -99,59 +107,65 @@
         throw exception;
       }
       applyAfterAdvices(self, method, args);
-        return applyAfterReturningAdvices(self, method, returnValue);
-      };
-      allAdvices.forEach(function (advice) {
-        target[methodName][jsAspect.advices[advice]] = [];
-      });
-      target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
+      return applyAfterReturningAdvices(self, method, returnValue);
     };
+    allAdvices.forEach(function (advice) {
+      target[methodName][jsAspect.advices[advice]] = [];
+    });
+    target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
+  }
 
-    function applyBeforeAdvices(context, method, args) {
-        var beforeAdvices = method[jsAspect.advices.before];
-        
-        beforeAdvices.forEach(function (advice) {
-            advice.apply(context, args);
-        });
-    };
+  function applyBeforeAdvices(context, method, args, joinPointContext) {
+    var beforeAdvices = method[jsAspect.advices.before];
 
-    function applyAroundAdvices(context, method, args) {
-        var aroundAdvices = method[jsAspect.advices.around]
-                .slice(0, method[jsAspect.advices.around].length),
-            firstAroundAdvice = aroundAdvices.shift(),
-            argsForAroundAdvicesChain = args.slice();
-        
-        argsForAroundAdvicesChain.unshift(aroundAdvices);
-        return firstAroundAdvice.apply(context, argsForAroundAdvicesChain);
-    };
+    beforeAdvices.forEach(function (advice) {
+      var adviceArguments = args.slice();
 
-    function applyAfterThrowingAdvices(context, method, exception) {
-        var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
-        
-        afterThrowingAdvices.forEach(function (advice) {
-            advice.call(context, exception);
-        });
-    };
+      adviceArguments.push(joinPointContext);
 
-    function applyAfterAdvices(context, method, args) {
-        var afterAdvices = method[jsAspect.advices.after];
-        
-        afterAdvices.forEach(function (advice) {
-            advice.apply(context, args);
-        });
-    };
+      if (!joinPointContext.isStopped) {
+        advice.apply(context, adviceArguments);
+      }
+    });
+  }
 
-    function applyAfterReturningAdvices(context, method, returnValue) {
-        var afterReturningAdvices = method[jsAspect.advices.afterReturning];
-        
-        return afterReturningAdvices.reduce(function (acc, current) {
-            return current(acc);
-        }, returnValue);
-    };
+  function applyAroundAdvices(context, method, args) {
+    var aroundAdvices = method[jsAspect.advices.around]
+        .slice(0, method[jsAspect.advices.around].length),
+      firstAroundAdvice = aroundAdvices.shift(),
+      argsForAroundAdvicesChain = args.slice();
 
-    function isFunction(obj) {
-        return obj && Object.prototype.toString.call(obj) == '[object Function]';
-    }
-    
-    host.jsAspect = jsAspect;
+    argsForAroundAdvicesChain.unshift(aroundAdvices);
+    return firstAroundAdvice.apply(context, argsForAroundAdvicesChain);
+  }
+
+  function applyAfterThrowingAdvices(context, method, exception) {
+    var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
+
+    afterThrowingAdvices.forEach(function (advice) {
+      advice.call(context, exception);
+    });
+  }
+
+  function applyAfterAdvices(context, method, args) {
+    var afterAdvices = method[jsAspect.advices.after];
+
+    afterAdvices.forEach(function (advice) {
+      advice.apply(context, args);
+    });
+  }
+
+  function applyAfterReturningAdvices(context, method, returnValue) {
+    var afterReturningAdvices = method[jsAspect.advices.afterReturning];
+
+    return afterReturningAdvices.reduce(function (acc, current) {
+      return current(acc);
+    }, returnValue);
+  }
+
+  function isFunction(obj) {
+    return obj && Object.prototype.toString.call(obj) == '[object Function]';
+  }
+
+  host.jsAspect = jsAspect;
 })(window);
