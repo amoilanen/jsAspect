@@ -90,17 +90,10 @@
         method = target[methodName],
         args = [].slice.call(arguments, 0),
         returnValue = undefined,
-        joinPointContext = {
-          isStopped: false,
-          methodName: methodName,
-          targetConstructor: target.constructor,
-          stop: function() {
-            this.isStopped = true;
-          }
-        };
+        executionContext = new ExecutionContext(target, methodName);
 
-      applyBeforeAdvices(self, method, args, joinPointContext);
-      if (joinPointContext.isStopped) return;
+      applyBeforeAdvices(self, method, args, executionContext);
+      if (executionContext.isStopped) return;
       try {
         returnValue = applyAroundAdvices(self, method, args);
       } catch (exception) {
@@ -116,15 +109,15 @@
     target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
   }
 
-  function applyBeforeAdvices(context, method, args, joinPointContext) {
+  function applyBeforeAdvices(context, method, args, executionContext) {
     var beforeAdvices = method[jsAspect.advices.before];
 
     beforeAdvices.forEach(function (advice) {
       var adviceArguments = args.slice();
 
-      adviceArguments.unshift(joinPointContext);
+      adviceArguments.unshift(executionContext);
 
-      if (!joinPointContext.isStopped) {
+      if (!executionContext.isStopped) {
         advice.apply(context, adviceArguments);
       }
     });
@@ -163,6 +156,17 @@
       return current(acc);
     }, returnValue);
   }
+
+  function ExecutionContext(target, methodName) {
+    this.target = target;
+    this.methodName = methodName;
+    this.targetConstructor = target.constructor;
+    this.isStopped = false;
+  }
+
+  ExecutionContext.prototype.stop = function() {
+    this.isStopped = true;
+  };
 
   function isFunction(obj) {
     return obj && Object.prototype.toString.call(obj) == '[object Function]';
