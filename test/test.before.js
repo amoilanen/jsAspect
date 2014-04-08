@@ -233,14 +233,14 @@ module("jsAspect.before");
     jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before, function() {
       var context = arguments[arguments.length - 1];
 
-      calledClassNames.push(context.constructor.name);
+      calledClassNames.push(context.targetConstructor.name);
     });
 
     //An example for a own data type.
     jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before, function() {
       var context = arguments[arguments.length - 1];
 
-      calledClassNames.push(context.constructor.name);
+      calledClassNames.push(context.targetConstructor.name);
     });
 
     var acc = new Account();

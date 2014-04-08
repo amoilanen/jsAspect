@@ -93,7 +93,7 @@
         joinPointContext = {
           isStopped: false,
           methodName: methodName,
-          constructor: target.constructor,
+          targetConstructor: target.constructor,
           stop: function() {
             this.isStopped = true;
           }
