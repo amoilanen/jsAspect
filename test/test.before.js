@@ -16,8 +16,7 @@ module("jsAspect.before");
 
     jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
       function beforeCallback() {
-        var args = [].slice.call(arguments, 0);
-        args.pop();
+        var args = [].slice.call(arguments, 1);
 
         this.beforeCallbackArgs = this.beforeCallbackArgs || [];
         this.beforeCallbackArgs.push(args);
@@ -65,8 +64,7 @@ module("jsAspect.before");
       (function (adviceName) {
         jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
           function() {
-            var args = [].slice.call(arguments, 0);
-            args.pop();
+            var args = [].slice.call(arguments, 1);
 
             this[adviceName] = this[adviceName] || [];
             this[adviceName].push(args);
@@ -97,8 +95,7 @@ module("jsAspect.before");
 
     jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
       function() {
-        var args = [].slice.call(arguments, 0);
-        args.pop();
+        var args = [].slice.call(arguments, 1);
 
         this.accumulated = this.accumulated || [];
         this.accumulated.push(args);
@@ -129,8 +126,7 @@ module("jsAspect.before");
 
     jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
       function() {
-        var args = [].slice.call(arguments, 0);
-        args.pop();
+        var args = [].slice.call(arguments, 1);
 
         this.accumulated = this.accumulated || [];
         this.accumulated.push(args);
@@ -154,9 +150,7 @@ module("jsAspect.before");
     var calledMethodNames = [];
 
     jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
-      function() {
-        var context = arguments[arguments.length - 1];
-
+      function(context) {
         calledMethodNames.push(context.methodName);
       }
     );
@@ -192,9 +186,7 @@ module("jsAspect.before");
       }
     );
     jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
-      function() {
-        var context = arguments[arguments.length - 1];
-
+      function(context) {
         context.stop();
         calledAdviceNames.push("beforeAdvice3");
       }
@@ -230,16 +222,12 @@ module("jsAspect.before");
 
     var calledClassNames = [];
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before, function() {
-      var context = arguments[arguments.length - 1];
-
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 
     //An example for a own data type.
-    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before, function() {
-      var context = arguments[arguments.length - 1];
-
+    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 

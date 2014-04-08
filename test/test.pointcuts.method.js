@@ -27,8 +27,7 @@ module("jsAspect.pointcuts.method");
 
     jsAspect.inject(global, jsAspect.pointcuts.method, jsAspect.advices.before,
       function() {
-        var args = [].slice.call(arguments, 0);
-        args.pop();
+        var args = [].slice.call(arguments, 1);
 
         this.accumulated = this.accumulated || [];
         this.accumulated.push(args);

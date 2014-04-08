@@ -122,7 +122,7 @@
     beforeAdvices.forEach(function (advice) {
       var adviceArguments = args.slice();
 
-      adviceArguments.push(joinPointContext);
+      adviceArguments.unshift(joinPointContext);
 
       if (!joinPointContext.isStopped) {
         advice.apply(context, adviceArguments);
