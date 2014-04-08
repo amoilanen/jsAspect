@@ -206,60 +206,48 @@ module("jsAspect.before");
     deepEqual(calledAdviceNames, ["beforeAdvice3", "beforeAdvice3"], "Remaining advices have not been called");
   });
 
-	test("jsAspect.inject 'before' advice, last `context` argument contains target/class name", function ()
-	{
-		var obj = {
-			method1: function ()
-			{
-				return "method1value";
-			},
-			method2: function ()
-			{
-				return "method2value";
-			}
-		};
+  test("jsAspect.inject 'before' advice, last `context` argument contains target constructor name", function() {
+    var obj = {
+      method1: function() {
+        return "method1value";
+      },
+      method2: function() {
+        return "method2value";
+      }
+    };
 
+    function Account(){
+      this.amount = 1000;
+    }
 
-		function Account(){
-			this.amount = 1000;
-		}
+    Account.prototype.withDraw = function(nAmount) {
+      if (this.amount < nAmount) {
+        return false;
+      }
+      this.amount -= nAmount;
+      return true;
+    };
 
-		Account.prototype.withDraw = function (nAmount)
-		{
-			if (this.amount < nAmount)
-			{
-				return false;
-			}
-			this.amount -= nAmount;
-			return true;
-		};
+    var calledClassNames = [];
 
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before, function() {
+      var context = arguments[arguments.length - 1];
 
-		var calledClassNames = [];
+      calledClassNames.push(context.constructor.name);
+    });
 
-		jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
-			function ()
-			{
-				var context = arguments[arguments.length - 1];
+    //An example for a own data type.
+    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before, function() {
+      var context = arguments[arguments.length - 1];
 
-				calledClassNames.push(context.className);
-			}
-		);
+      calledClassNames.push(context.constructor.name);
+    });
 
-		//An example for a own data type.
-		jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
-			function ()
-			{
-				var context = arguments[arguments.length - 1];
+    var acc = new Account();
 
-				calledClassNames.push(context.className);
-			}
-		);
-		var acc1 = new Account();
-
-		equal(obj.method1(), "method1value", "method1 executed");
-		equal(obj.method2(), "method2value", "method2 executed");
-		equal(acc1.withDraw(500), true, "withDrawn 500 dollars");
-		deepEqual(calledClassNames, ["Object", "Object", "Account"], "Method name is available in context");
-	});
+    equal(obj.method1(), "method1value", "method1 executed");
+    equal(obj.method2(), "method2value", "method2 executed");
+    equal(acc.withDraw(500), true, "withDrawn 500 dollars");
+    deepEqual(calledClassNames, ["Object", "Object", "Account"], "Constructor name is available in context");
+  });
 })();
