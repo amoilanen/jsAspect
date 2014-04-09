@@ -372,13 +372,18 @@
 
   /**
    * An aspect contains advices and the target to apply the advices to.
-   * @param {Advice[]} advices
+   * Advices can be passed both as an array and specified as arguments to the constructor.
+   * @param advices
    *
    * @class Aspect
    * @constructor
    */
-  function Aspect(advices){
-     this.advices = advices || [];
+  function Aspect(advices) {
+    if (arguments.length == 1) {
+      this.advices = advices || [];
+    } else {
+      this.advices = [].slice.call(arguments, 0);
+    }
   }
 
   /**

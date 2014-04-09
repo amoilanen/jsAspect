@@ -15,11 +15,11 @@ module("jsAspect.Aspect");
 
     var called = [];
 
-    var objectAspect = new jsAspect.Aspect([new jsAspect.Before(function (context) {
+    var aspect = new jsAspect.Aspect([new jsAspect.Before(function (context) {
       called.push({method: context.methodName, constructor: context.targetConstructor.name});
     })]);
 
-    objectAspect.applyTo(Target);
+    aspect.applyTo(Target);
 
     var obj = new Target();
 
@@ -44,7 +44,7 @@ module("jsAspect.Aspect");
 
     var called = [];
 
-    var objectAspect = new jsAspect.Aspect([
+    var aspect = new jsAspect.Aspect([
       new jsAspect.Before(function(context) {
         called.push({
           method: context.methodName,
@@ -57,7 +57,7 @@ module("jsAspect.Aspect");
       })
     ]);
 
-    objectAspect.applyTo(Target);
+    aspect.applyTo(Target);
 
     var obj = new Target();
 
@@ -93,7 +93,7 @@ module("jsAspect.Aspect");
 
     var called = [];
 
-    var objectAspect = new jsAspect.Aspect([
+    var aspect = new jsAspect.Aspect([
       new jsAspect.Before(function(context) {
         called.push({
           method: context.methodName,
@@ -106,8 +106,8 @@ module("jsAspect.Aspect");
       })
     ]);
 
-    objectAspect.applyTo(Target1);
-    objectAspect.applyTo(Target2);
+    aspect.applyTo(Target1);
+    aspect.applyTo(Target2);
 
     var obj1 = new Target1();
 
@@ -145,19 +145,47 @@ module("jsAspect.Aspect");
 
     var called = [];
 
-    var objectAspect = new jsAspect.Aspect([
+    var aspect = new jsAspect.Aspect([
       new jsAspect.Before(function() {
         called.push(this);
       }, jsAspect.pointcuts.methods)
     ]);
 
-    //Same as objectAspect.applyTo.apply(objectAspect, objects);
-    objectAspect.applyTo(objects[0], objects[1], objects[2]);
+    //Same as aspect.applyTo.apply(aspect, objects);
+    aspect.applyTo(objects[0], objects[1], objects[2]);
 
     objects.forEach(function(obj, idx) {
       equal(obj.method(), "methodvalue", "object " + idx + " method successful");
     });
 
     deepEqual(called, objects, "Aspect was applied for all objects");
+  });
+
+  test("jsAspect.Aspect: constructor can take multiple arguments", function() {
+    var obj = {
+      method: function() {
+        return "methodvalue";
+      }
+    };
+
+    var called = [];
+
+    var aspect = new jsAspect.Aspect(
+      new jsAspect.Before(function() {
+        called.push("advice1");
+      }, jsAspect.pointcuts.methods),
+      new jsAspect.Before(function() {
+        called.push("advice2");
+      }, jsAspect.pointcuts.methods),
+      new jsAspect.Before(function() {
+        called.push("advice3");
+      }, jsAspect.pointcuts.methods)
+    );
+
+    aspect.applyTo(obj);
+
+    equal(obj.method(), "methodvalue", "method is called successfully");
+
+    deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
   });
 })();
