@@ -270,7 +270,13 @@
   }
 
   /**
-   * Can be used to stop the method execution in <i>before</i> join point
+   * Can be used to stop the method execution. For example:
+   * <ul>
+   * <li>In <i>before</i> join point to prevent method from execution</li>
+   * <li>In <i>afterThrowing</i> to prevent any applied <i>after</i> advices from execution </li>
+   * <li>In <i>around</i> to prevent returning a value from a method and prevent
+   * any other advices from execution</li>
+   * </ul>
    * @method stop
    */
   ExecutionContext.prototype.stop = function() {
@@ -297,6 +303,7 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
    * @param {Function} func
+   * @param {pointcut} pointcut
    *
    * @class Before
    * @extends Advice
@@ -310,6 +317,7 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
    * @param {Function} func
+   * @param {pointcut} pointcut
    *
    * @class After
    * @extends Advice
@@ -323,6 +331,7 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
    * @param {Function} func
+   * @param {pointcut} pointcut
    *
    * @class AfterReturning
    * @extends Advice
@@ -336,6 +345,7 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
    * @param {Function} func
+   * @param {pointcut} pointcut
    *
    * @class AfterThrowing
    * @extends Advice
@@ -349,6 +359,7 @@
   /**
    * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
    * @param {Function} func
+   * @param {pointcut} pointcut
    *
    * @class Around
    * @extends Advice
