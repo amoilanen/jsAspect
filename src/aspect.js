@@ -11,7 +11,7 @@
    * http://smthngsmwhr.wordpress.com/2013/06/23/aspect-oriented-programming-in-javascript/
    */
   var jsAspect = {
-    pointcuts: {},
+      pointcuts: {},
       joinPoints: {}
     },
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
@@ -293,12 +293,12 @@
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
    * @param {Function} func
    *
-   * @class BeforeAdvice
+   * @class Before
    * @extends Advice
    *
    * @constructor
    */
-  function BeforeAdvice(func){
+  function Before(func){
      Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, func);
   }
 
@@ -306,13 +306,52 @@
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
    * @param {Function} func
    *
-   * @class AfterAdvice
+   * @class After
    * @extends Advice
    *
    * @constructor
    */
-  function AfterAdvice(func) {
+  function After(func) {
     Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after, func);
+  }
+
+  /**
+   * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
+   * @param {Function} func
+   *
+   * @class AfterReturning
+   * @extends Advice
+   *
+   * @constructor
+   */
+  function AfterReturning(func) {
+    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterReturning, func);
+  }
+
+  /**
+   * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
+   * @param {Function} func
+   *
+   * @class AfterThrowing
+   * @extends Advice
+   *
+   * @constructor
+   */
+  function AfterThrowing(func) {
+    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing, func);
+  }
+
+  /**
+   * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
+   * @param {Function} func
+   *
+   * @class Around
+   * @extends Advice
+   *
+   * @constructor
+   */
+  function Around(func) {
+    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around, func);
   }
 
   /**
@@ -341,8 +380,11 @@
     return obj && Object.prototype.toString.call(obj) == '[object Function]';
   }
 
-  jsAspect.BeforeAdvice = BeforeAdvice;
-  jsAspect.AfterAdvice = AfterAdvice;
+  jsAspect.Before = Before;
+  jsAspect.After = After;
+  jsAspect.AfterReturning = AfterReturning;
+  jsAspect.AfterThrowing = AfterThrowing;
+  jsAspect.Around = Around;
   jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
 })(window);

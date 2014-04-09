@@ -15,7 +15,7 @@ module("jsAspect.Aspect.applyTo");
 
     var called = [];
 
-    var objectAspect = new jsAspect.Aspect([new jsAspect.BeforeAdvice(function (context) {
+    var objectAspect = new jsAspect.Aspect([new jsAspect.Before(function (context) {
       called.push({method: context.methodName, constructor: context.targetConstructor.name});
     })]);
 
@@ -45,14 +45,14 @@ module("jsAspect.Aspect.applyTo");
     var called = [];
 
     var objectAspect = new jsAspect.Aspect([
-      new jsAspect.BeforeAdvice(function(context) {
+      new jsAspect.Before(function(context) {
         called.push({
           method: context.methodName,
           constructor: context.targetConstructor.name, 
           joinPoint: "before"
         });
       }),
-      new jsAspect.AfterAdvice(function() {
+      new jsAspect.After(function() {
         called.push({joinPoint: "after"});
       })
     ]);
@@ -94,14 +94,14 @@ module("jsAspect.Aspect.applyTo");
     var called = [];
 
     var objectAspect = new jsAspect.Aspect([
-      new jsAspect.BeforeAdvice(function(context) {
+      new jsAspect.Before(function(context) {
         called.push({
           method: context.methodName,
           constructor: context.targetConstructor.name,
           joinPoint: "before"
         });
       }),
-      new jsAspect.AfterAdvice(function() {
+      new jsAspect.After(function() {
         called.push({joinPoint: "after"});
       })
     ]);
