@@ -5,12 +5,29 @@
  */
 (function(host) {
 
+  /**
+   * The implementation to intercept constructor or objects with join points.
+   * @class jsAspect
+   * http://smthngsmwhr.wordpress.com/2013/06/23/aspect-oriented-programming-in-javascript/
+   */
   var jsAspect = {
     pointcuts: {},
       advices: {}
     },
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
+
+    /**
+     * All supported join points to join additional behavior.
+     * @enum {string}
+     * @readonly
+     */
     allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
+
+    /**
+     * All supported pointcuts.
+     * @enum {string}
+     * @readonly
+     */
     allPointcuts = ["methods", "prototypeMethods", "method"];
 
   allAdvices.forEach(function (advice) {
@@ -20,17 +37,35 @@
     jsAspect.pointcuts[pointcut] = pointcut;
   });
 
+  /**
+   * Extends/Introduces additional properties like fields or function to a passed constructor or object.
+   * @param {Function|Object} target The object or constructor that want to be extended
+   * @param {allPointcuts} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
+   * @param {Object} introduction The properties that want to be extended.
+   * @method introduce
+   * @returns {Object} The target with extended properties.
+   */
   jsAspect.introduce = function (target, pointcut, introduction) {
     target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
+
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
         target[property] = introduction[property];
       }
     }
+
+    return target;
   };
 
   /**
-   * 'methodName' makes sense only for the 'method' pointcut, optional parameter
+   * Creates join points at the passed pointcut and advice name.
+   * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
+   * @param {allPointcuts} pointcut The pointcut to specify or quantify the join points.
+   * @param {allAdvices} adviceName The chosen join point to add the advice code.
+   * @param {Function} advice The code, that needs to be executed at the join point.
+   * @param {String} [methodName] The name of the method that need to be advised.
+   * @method inject
+   * @returns void
    */
   jsAspect.inject = function (target, pointcut, adviceName, advice, methodName) {
     if (jsAspect.pointcuts.method == pointcut) {
@@ -45,6 +80,15 @@
     }
   };
 
+  /**
+   * Intercepts a single method with a join point and adds an advice.
+   * @param target
+   * @param methodName
+   * @param advice
+   * @param adviceName
+   * @private
+   * @method injectAdvice
+   */
   function injectAdvice(target, methodName, advice, adviceName) {
     if (isFunction(target[methodName])) {
       if (jsAspect.advices.around == adviceName) {
@@ -58,30 +102,43 @@
     }
   }
 
+  /**
+   * Wraps an existing advice, to add a additional advice at the same join point.
+   * @param advice
+   * @returns {wrappedAdvice}
+   * @method wrapAroundAdvice
+   * @private
+   */
   function wrapAroundAdvice(advice) {
-    var oldAdvice = advice,
-      wrappedAdvice = function(leftAroundAdvices) {
-        var oThis = this,
-          nextWrappedAdvice = leftAroundAdvices.shift(),
-          args = [].slice.call(arguments, 1);
 
-        if (nextWrappedAdvice) {
-          var nextUnwrappedAdvice = function() {
-            var argsForWrapped = [].slice.call(arguments, 0);
+    var wrappedAdvice = function(leftAroundAdvices) {
+      var oThis = this,
+        nextWrappedAdvice = leftAroundAdvices.shift(),
+        args = [].slice.call(arguments, 1);
 
-            argsForWrapped.unshift(leftAroundAdvices);
-            return nextWrappedAdvice.apply(oThis, argsForWrapped);
-          };
-          args.unshift(nextUnwrappedAdvice);
+      if (nextWrappedAdvice) {
+        var nextUnwrappedAdvice = function() {
+          var argsForWrapped = [].slice.call(arguments, 0);
+
+          argsForWrapped.unshift(leftAroundAdvices);
+          return nextWrappedAdvice.apply(oThis, argsForWrapped);
         };
-        return oldAdvice.apply(this, args);
-      };
+        args.unshift(nextUnwrappedAdvice);
+      }
+      return advice.apply(this, args);
+    };
 
     //Can be useful for debugging
-    wrappedAdvice.__originalAdvice = oldAdvice;
+    wrappedAdvice.__originalAdvice = advice;
     return wrappedAdvice;
   }
 
+  /**
+   * Intercepts the target's method with all supported join points
+   * @param target
+   * @param methodName
+   * @method enhanceWithAdvices
+   */
   function enhanceWithAdvices(target, methodName) {
     var originalMethod = target[methodName];
 
@@ -109,6 +166,14 @@
     target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
   }
 
+  /**
+   * Adds the before-join point to add behaviour <i>before</i> the method is executed.
+   * @param context
+   * @param method
+   * @param args
+   * @param executionContext
+   * @method applyBeforeAdvices
+   */
   function applyBeforeAdvices(context, method, args, executionContext) {
     var beforeAdvices = method[jsAspect.advices.before];
 
@@ -123,6 +188,15 @@
     });
   }
 
+  /**
+   * Adds the join point to control the method execution manually (executed before the <i>before</i> join point).
+   * @param context
+   * @param method
+   * @param args
+   * @method applyAroundAdvices
+   * @private
+   * @returns {Function|Object}
+   */
   function applyAroundAdvices(context, method, args) {
     var aroundAdvices = method[jsAspect.advices.around]
         .slice(0, method[jsAspect.advices.around].length),
@@ -133,6 +207,14 @@
     return firstAroundAdvice.apply(context, argsForAroundAdvicesChain);
   }
 
+  /**
+   * Adds the join point to add behaviour <i>after</i> the method thrown an exception.
+   * @param context
+   * @param method
+   * @param exception
+   * @method applyAfterThrowingAdvices
+   * @private
+   */
   function applyAfterThrowingAdvices(context, method, exception) {
     var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
 
@@ -141,6 +223,13 @@
     });
   }
 
+  /**
+   * Adds the before-join point to add behaviour <i>before</i> the method is executed.
+   * @param context
+   * @param method
+   * @param args
+   * @method applyAfterAdvices
+   */
   function applyAfterAdvices(context, method, args) {
     var afterAdvices = method[jsAspect.advices.after];
 
@@ -149,6 +238,14 @@
     });
   }
 
+  /**
+   * Adds the join point to add behaviour <i>after</i> the method returned a value or the method stopped working (no return value).
+   * @param context
+   * @param method
+   * @param returnValue
+   * @method applyAfterReturningAdvices
+   * @returns {Object}
+   */
   function applyAfterReturningAdvices(context, method, returnValue) {
     var afterReturningAdvices = method[jsAspect.advices.afterReturning];
 
@@ -157,6 +254,12 @@
     }, returnValue);
   }
 
+  /**
+   * Type of the parameter, that is passed to the advices. It contains information about the method and constructor itself.
+   * @param target
+   * @param methodName
+   * @constructor
+   */
   function ExecutionContext(target, methodName) {
     this.target = target;
     this.methodName = methodName;
@@ -164,6 +267,10 @@
     this.isStopped = false;
   }
 
+  /**
+   * Can be used to stop the method execution in <i>before</i> join point
+   * @method stop
+   */
   ExecutionContext.prototype.stop = function() {
     this.isStopped = true;
   };
