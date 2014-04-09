@@ -1,4 +1,4 @@
-module("jsAspect.Aspect.applyTo");
+module("jsAspect.Aspect");
 
 (function() {
 
@@ -132,5 +132,32 @@ module("jsAspect.Aspect.applyTo");
       {method: "method2", constructor: "Target2", joinPoint: "before"},
       {joinPoint: "after"}
     ], "Advice on second constructor invoked");
+  });
+
+  test("jsAspect.Aspect.applyTo: can take multiple arguments", function() {
+    function Target() {
+      this.method = function() {
+        return "methodvalue";
+      };
+    }
+
+    var objects = [new Target(), new Target(), new Target()];
+
+    var called = [];
+
+    var objectAspect = new jsAspect.Aspect([
+      new jsAspect.Before(function() {
+        called.push(this);
+      }, jsAspect.pointcuts.methods)
+    ]);
+
+    //Same as objectAspect.applyTo.apply(objectAspect, objects);
+    objectAspect.applyTo(objects[0], objects[1], objects[2]);
+
+    objects.forEach(function(obj, idx) {
+      equal(obj.method(), "methodvalue", "object " + idx + " method successful");
+    });
+
+    deepEqual(called, objects, "Aspect was applied for all objects");
   });
 })();

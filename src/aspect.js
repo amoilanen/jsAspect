@@ -382,13 +382,17 @@
   }
 
   /**
-   * Applies this Aspect to the given target. One Aspect can be applied
-   * to multiple targets
+   * Applies this Aspect to the given target. If called with several arguments the Aspect
+   * will be applied to each one of them
    * @param target
    */
-  Aspect.prototype.applyTo = function(target) {
+  Aspect.prototype.applyTo = function() {
+    var targets = [].slice.call(arguments, 0);
+
     this.advices.forEach(function(advice) {
-      jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
+      targets.forEach(function(target) {
+        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
+      });
     });
   };
 
