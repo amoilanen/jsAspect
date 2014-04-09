@@ -25,7 +25,7 @@ module("jsAspect.pointcuts.method");
       return "method3value";
     };
 
-    jsAspect.inject(global, jsAspect.pointcuts.method, jsAspect.advices.before,
+    jsAspect.inject(global, jsAspect.pointcuts.method, jsAspect.joinPoints.before,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -48,7 +48,7 @@ module("jsAspect.pointcuts.method");
 
     global.field1 = "field1value";
 
-    jsAspect.inject(global, jsAspect.pointcuts.method, jsAspect.advices.before,
+    jsAspect.inject(global, jsAspect.pointcuts.method, jsAspect.joinPoints.before,
       function() {
         return "valuefromaspect";
       }, "field1");

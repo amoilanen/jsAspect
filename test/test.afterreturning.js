@@ -10,7 +10,7 @@ module("jsAspect.afterReturning");
             return {value: value};
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterReturning,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterReturning,
             function afterReturningCallback(retValue) {
                 retValue.value = retValue.value + 1;
                 return retValue;
@@ -31,7 +31,7 @@ module("jsAspect.afterReturning");
         };
         
         ["aspect1", "aspect2", "aspect3"].forEach(function (aspectName) {
-            jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterReturning,
+            jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterReturning,
                 function afterReturningCallback(retValue) {
                     return retValue + "_" + aspectName;
                 }

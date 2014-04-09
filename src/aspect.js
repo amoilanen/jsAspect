@@ -12,7 +12,7 @@
    */
   var jsAspect = {
     pointcuts: {},
-      advices: {}
+      joinPoints: {}
     },
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
 
@@ -21,7 +21,7 @@
      * @enum {string}
      * @readonly
      */
-    allAdvices = ["before", "after", "afterThrowing", "afterReturning", "around"],
+    allSupportedJoinPoints = ["before", "after", "afterThrowing", "afterReturning", "around"],
 
     /**
      * All supported pointcuts.
@@ -30,8 +30,8 @@
      */
     allPointcuts = ["methods", "prototypeMethods", "method"];
 
-  allAdvices.forEach(function (advice) {
-    jsAspect.advices[advice] = "__" + advice;
+  allSupportedJoinPoints.forEach(function (joinPoint) {
+    jsAspect.joinPoints[joinPoint] = "__" + joinPoint;
   });
   allPointcuts.forEach(function (pointcut) {
     jsAspect.pointcuts[pointcut] = pointcut;
@@ -61,20 +61,20 @@
    * Creates join points at the passed pointcut and advice name.
    * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
    * @param {allPointcuts} pointcut The pointcut to specify or quantify the join points.
-   * @param {allAdvices} adviceName The chosen join point to add the advice code.
+   * @param {allSupportedJoinPoints} joinPoint The chosen join point to add the advice code.
    * @param {Function} advice The code, that needs to be executed at the join point.
    * @param {String} [methodName] The name of the method that need to be advised.
    * @method inject
    * @returns void
    */
-  jsAspect.inject = function (target, pointcut, adviceName, advice, methodName) {
+  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodName) {
     if (jsAspect.pointcuts.method == pointcut) {
-      injectAdvice(target, methodName, advice, adviceName);
+      injectAdvice(target, methodName, advice, joinPoint);
     } else {
       target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
       for (var method in target) {
         if (target.hasOwnProperty(method)) {
-          injectAdvice(target, method, advice, adviceName);
+          injectAdvice(target, method, advice, joinPoint);
         }
       }
     }
@@ -85,20 +85,20 @@
    * @param target
    * @param methodName
    * @param advice
-   * @param adviceName
+   * @param joinPoint
    * @private
    * @method injectAdvice
    */
-  function injectAdvice(target, methodName, advice, adviceName) {
+  function injectAdvice(target, methodName, advice, joinPoint) {
     if (isFunction(target[methodName])) {
-      if (jsAspect.advices.around == adviceName) {
+      if (jsAspect.joinPoints.around == joinPoint) {
         advice = wrapAroundAdvice(advice);
       }
       if (!target[methodName][adviceEnhancedFlagName]) {
         enhanceWithAdvices(target, methodName);
         target[methodName][adviceEnhancedFlagName] = true;
       }
-      target[methodName][adviceName].unshift(advice);
+      target[methodName][joinPoint].unshift(advice);
     }
   }
 
@@ -160,10 +160,10 @@
       applyAfterAdvices(self, method, args);
       return applyAfterReturningAdvices(self, method, returnValue);
     };
-    allAdvices.forEach(function (advice) {
-      target[methodName][jsAspect.advices[advice]] = [];
+    allSupportedJoinPoints.forEach(function (advice) {
+      target[methodName][jsAspect.joinPoints[advice]] = [];
     });
-    target[methodName][jsAspect.advices.around].unshift(wrapAroundAdvice(originalMethod));
+    target[methodName][jsAspect.joinPoints.around].unshift(wrapAroundAdvice(originalMethod));
   }
 
   /**
@@ -175,7 +175,7 @@
    * @method applyBeforeAdvices
    */
   function applyBeforeAdvices(context, method, args, executionContext) {
-    var beforeAdvices = method[jsAspect.advices.before];
+    var beforeAdvices = method[jsAspect.joinPoints.before];
 
     beforeAdvices.forEach(function (advice) {
       var adviceArguments = args.slice();
@@ -198,8 +198,8 @@
    * @returns {Function|Object}
    */
   function applyAroundAdvices(context, method, args) {
-    var aroundAdvices = method[jsAspect.advices.around]
-        .slice(0, method[jsAspect.advices.around].length),
+    var aroundAdvices = method[jsAspect.joinPoints.around]
+        .slice(0, method[jsAspect.joinPoints.around].length),
       firstAroundAdvice = aroundAdvices.shift(),
       argsForAroundAdvicesChain = args.slice();
 
@@ -216,7 +216,7 @@
    * @private
    */
   function applyAfterThrowingAdvices(context, method, exception) {
-    var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
+    var afterThrowingAdvices = method[jsAspect.joinPoints.afterThrowing];
 
     afterThrowingAdvices.forEach(function (advice) {
       advice.call(context, exception);
@@ -231,7 +231,7 @@
    * @method applyAfterAdvices
    */
   function applyAfterAdvices(context, method, args) {
-    var afterAdvices = method[jsAspect.advices.after];
+    var afterAdvices = method[jsAspect.joinPoints.after];
 
     afterAdvices.forEach(function (advice) {
       advice.apply(context, args);
@@ -247,7 +247,7 @@
    * @returns {Object}
    */
   function applyAfterReturningAdvices(context, method, returnValue) {
-    var afterReturningAdvices = method[jsAspect.advices.afterReturning];
+    var afterReturningAdvices = method[jsAspect.joinPoints.afterReturning];
 
     return afterReturningAdvices.reduce(function (acc, current) {
       return current(acc);
@@ -255,7 +255,7 @@
   }
 
   /**
-   * Type of the parameter, that is passed to the advices. It contains information about the method and constructor itself.
+   * Type of the parameter, that is passed to the joinPoints. It contains information about the method and constructor itself.
    * @param target
    * @param methodName
    * @constructor

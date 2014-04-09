@@ -14,7 +14,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
+    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
       function beforeCallback() {
         var args = [].slice.call(arguments, 1);
 
@@ -36,7 +36,7 @@ module("jsAspect.before");
 
     Object.prototype.field1 = "field1value";
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
+    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
       function beforeCallback() {
       }
     );
@@ -62,7 +62,7 @@ module("jsAspect.before");
 
     adviceNames.forEach(function(adviceName) {
       (function (adviceName) {
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
           function() {
             var args = [].slice.call(arguments, 1);
 
@@ -93,7 +93,7 @@ module("jsAspect.before");
       return "method1value";
     };
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before,
+    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -124,7 +124,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -149,7 +149,7 @@ module("jsAspect.before");
     };
     var calledMethodNames = [];
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
       function(context) {
         calledMethodNames.push(context.methodName);
       }
@@ -174,18 +174,18 @@ module("jsAspect.before");
       }
     };
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
       function() {
         calledAdviceNames.push("beforeAdvice1");
       }
     );
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
       function() {
         calledAdviceNames.push("beforeAdvice2");
       }
     );
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before,
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
       function(context) {
         context.stop();
         calledAdviceNames.push("beforeAdvice3");
@@ -195,7 +195,7 @@ module("jsAspect.before");
     equal(obj.method1(), undefined, "Stopped execution of method1");
     equal(obj.method2(), undefined, "Stopped execution of method2");
     deepEqual(calledMethodNames, [], "Original methods have been stopped");
-    deepEqual(calledAdviceNames, ["beforeAdvice3", "beforeAdvice3"], "Remaining advices have not been called");
+    deepEqual(calledAdviceNames, ["beforeAdvice3", "beforeAdvice3"], "Remaining joinPoints have not been called");
   });
 
   test("jsAspect.inject 'before' advice, last `context` argument contains target constructor name", function() {
@@ -222,12 +222,12 @@ module("jsAspect.before");
 
     var calledClassNames = [];
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.before, function(context) {
+    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 
     //An example for a own data type.
-    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.before, function(context) {
+    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 

@@ -14,7 +14,7 @@ module("jsAspect.after");
             return "method2value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
             function afterCallback() {
                 var args = [].slice.call(arguments, 0);
 
@@ -36,7 +36,7 @@ module("jsAspect.after");
 
         Object.prototype.field1 = "field1value";
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
             function afterCallback() {
             }
         );
@@ -46,7 +46,7 @@ module("jsAspect.after");
         equal(obj.field1, "field1value", "fields are not affected")
     });
     
-    test("jsAspect.inject: multiple 'after' advices, 'prototypeMethods' pointcut", function() {
+    test("jsAspect.inject: multiple 'after' joinPoints, 'prototypeMethods' pointcut", function() {
         var adviceNames = ["advice1", "advice2", "advice3", "advice4", "advice5"];
         
         function Object() {
@@ -62,7 +62,7 @@ module("jsAspect.after");
         
         adviceNames.forEach(function(adviceName) {
             (function (adviceName) {
-                jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
+                jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
                     function() {
                         var args = [].slice.call(arguments, 0);
 
@@ -93,7 +93,7 @@ module("jsAspect.after");
             return "method1value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.after,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
             function() {
                 var args = [].slice.call(arguments, 0);
             
@@ -124,7 +124,7 @@ module("jsAspect.after");
             return "method2value";
         };
 
-        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.advices.after,
+        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.after,
             function() {
                 var args = [].slice.call(arguments, 0);
             
