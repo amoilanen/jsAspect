@@ -279,5 +279,71 @@
     return obj && Object.prototype.toString.call(obj) == '[object Function]';
   }
 
+  /**
+   * The advice class is the
+   * @param {pointcuts} pointcut
+   * @param {joinPoints} joinPoint
+   * @param {Function} fnBehaviour
+   * @class Advice
+   * @constructor
+   */
+  jsAspect.Advice = function(pointcut, joinPoint, fnBehaviour){
+     this.pointcut = pointcut;
+     this.joinPoint = joinPoint;
+     this.fnBehaviour = fnBehaviour;
+  };
+
+  /**
+   * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
+   * @param {Function} fnBehaviour
+   *
+   * @class BeforeAdvice
+   * @extends Advice
+   *
+   * @constructor
+   */
+  jsAspect.BeforeAdvice = function(fnBehaviour){
+     jsAspect.Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, fnBehaviour);
+  };
+
+  /**
+   * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
+   * @param {Function} fnBehaviour
+   *
+   * @class AfterAdvice
+   * @extends Advice
+   *
+   * @constructor
+   */
+  jsAspect.AfterAdvice = function (fnBehaviour){
+    jsAspect.Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after, fnBehaviour);
+  };
+
+  /**
+   * An aspect contains advices and the target to apply the advices to.
+   * @param {Advice[]} advices
+   *
+   * @class Aspect
+   *
+   * @constructor
+   */
+  jsAspect.Aspect = function(advices){
+     this.advices = advices || [];
+  };
+
+  /**
+   * Applies the Aspect
+   * @param target
+   * @param aspect
+   */
+  jsAspect.applyAspect = function(target, aspect){
+     if(aspect instanceof jsAspect.Aspect){
+        for(var index in aspect.advices){
+           var advice = aspect.advices[index];
+           jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.fnBehaviour);
+        }
+     }
+  };
+
   host.jsAspect = jsAspect;
 })(window);
