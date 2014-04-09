@@ -42,9 +42,10 @@
    * @param {Function|Object} target The object or constructor that want to be extended
    * @param {allPointcuts} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
    * @param {Object} introduction The properties that want to be extended.
+   * @method introduce
    * @returns {Object} The target with extended properties.
    */
-  jsAspect.extend = function (target, pointcut, introduction) {
+  jsAspect.introduce = function (target, pointcut, introduction) {
     target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
 
     for (var property in introduction) {
@@ -105,6 +106,7 @@
    * Wraps an existing advice, to add a additional advice at the same join point.
    * @param advice
    * @returns {wrappedAdvice}
+   * @method wrapAroundAdvice
    * @private
    */
   function wrapAroundAdvice(advice) {
@@ -135,6 +137,7 @@
    * Intercepts the target's method with all supported join points
    * @param target
    * @param methodName
+   * @method enhanceWithAdvices
    */
   function enhanceWithAdvices(target, methodName) {
     var originalMethod = target[methodName];
@@ -169,6 +172,7 @@
    * @param method
    * @param args
    * @param executionContext
+   * @method applyBeforeAdvices
    */
   function applyBeforeAdvices(context, method, args, executionContext) {
     var beforeAdvices = method[jsAspect.advices.before];
@@ -189,6 +193,8 @@
    * @param context
    * @param method
    * @param args
+   * @method applyAroundAdvices
+   * @private
    * @returns {Function|Object}
    */
   function applyAroundAdvices(context, method, args) {
@@ -206,6 +212,8 @@
    * @param context
    * @param method
    * @param exception
+   * @method applyAfterThrowingAdvices
+   * @private
    */
   function applyAfterThrowingAdvices(context, method, exception) {
     var afterThrowingAdvices = method[jsAspect.advices.afterThrowing];
@@ -220,6 +228,7 @@
    * @param context
    * @param method
    * @param args
+   * @method applyAfterAdvices
    */
   function applyAfterAdvices(context, method, args) {
     var afterAdvices = method[jsAspect.advices.after];
@@ -234,6 +243,7 @@
    * @param context
    * @param method
    * @param returnValue
+   * @method applyAfterReturningAdvices
    * @returns {Object}
    */
   function applyAfterReturningAdvices(context, method, returnValue) {
@@ -257,6 +267,10 @@
     this.isStopped = false;
   }
 
+  /**
+   * Can be used to stop the method execution in <i>before</i> join point
+   * @method stop
+   */
   ExecutionContext.prototype.stop = function() {
     this.isStopped = true;
   };
