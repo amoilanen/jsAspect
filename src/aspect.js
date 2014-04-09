@@ -37,6 +37,8 @@
     jsAspect.pointcuts[pointcut] = pointcut;
   });
 
+  var DEFAULT_POINTCUT = jsAspect.pointcuts.prototypeMethods;
+
   /**
    * Extends/Introduces additional properties like fields or function to a passed constructor or object.
    * @param {Function|Object} target The object or constructor that want to be extended
@@ -283,10 +285,13 @@
    * @class Advice
    * @constructor
    */
-  function Advice(pointcut, joinPoint, func){
-     this.pointcut = pointcut;
-     this.joinPoint = joinPoint;
-     this.func = func;
+  function Advice(pointcut, joinPoint, func) {
+    if (pointcut == (void 0)) {
+        pointcut = DEFAULT_POINTCUT;
+    }
+    this.pointcut = pointcut;
+    this.joinPoint = joinPoint;
+    this.func = func;
   };
 
   /**
@@ -298,8 +303,8 @@
    *
    * @constructor
    */
-  function Before(func){
-     Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, func);
+  function Before(func, pointcut) {
+     Advice.call(this, pointcut, jsAspect.joinPoints.before, func);
   }
 
   /**
@@ -311,8 +316,8 @@
    *
    * @constructor
    */
-  function After(func) {
-    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after, func);
+  function After(func, pointcut) {
+    Advice.call(this, pointcut, jsAspect.joinPoints.after, func);
   }
 
   /**
@@ -324,8 +329,8 @@
    *
    * @constructor
    */
-  function AfterReturning(func) {
-    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterReturning, func);
+  function AfterReturning(func, pointcut) {
+    Advice.call(this, pointcut, jsAspect.joinPoints.afterReturning, func);
   }
 
   /**
@@ -337,8 +342,8 @@
    *
    * @constructor
    */
-  function AfterThrowing(func) {
-    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing, func);
+  function AfterThrowing(func, pointcut) {
+    Advice.call(this, pointcut, jsAspect.joinPoints.afterThrowing, func);
   }
 
   /**
@@ -350,8 +355,8 @@
    *
    * @constructor
    */
-  function Around(func) {
-    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around, func);
+  function Around(func, pointcut) {
+    Advice.call(this, pointcut, jsAspect.joinPoints.around, func);
   }
 
   /**
