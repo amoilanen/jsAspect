@@ -14,7 +14,7 @@ module("jsAspect.afterThrowing");
             throw new Error("method2exception");
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing,
             function afterThrowingCallback(exception) {
                 this.thrownExceptions = this.thrownExceptions || [];
                 this.thrownExceptions.push(exception.message);
@@ -48,12 +48,12 @@ module("jsAspect.afterThrowing");
             throw new Error("method2exception");
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing,
             function afterThrowingCallback(exception) {
                 exception.message = exception.message + "_aspect1"
             }
         );
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing,
             function afterThrowingCallback(exception) {
                 exception.message = exception.message + "_aspect2"
             }
@@ -81,7 +81,7 @@ module("jsAspect.afterThrowing");
             throw new Error("method1exception");
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.advices.afterThrowing,
+        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.afterThrowing,
             function afterThrowingCallback(exception) {
                 throw new Error("callbackexception");            
             }
