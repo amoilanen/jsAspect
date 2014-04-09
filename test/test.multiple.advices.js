@@ -19,7 +19,7 @@ module("jsAspect.Aspect.applyTo");
       called.push({method: context.methodName, constructor: context.targetConstructor.name});
     })]);
 
-    jsAspect.applyAspect(Target, objectAspect);
+    objectAspect.applyTo(Target);
 
     var obj = new Target();
 
@@ -57,7 +57,7 @@ module("jsAspect.Aspect.applyTo");
       })
     ]);
 
-    jsAspect.applyAspect(Target, objectAspect);
+    objectAspect.applyTo(Target);
 
     var obj = new Target();
 
@@ -106,8 +106,8 @@ module("jsAspect.Aspect.applyTo");
       })
     ]);
 
-    jsAspect.applyAspect(Target1, objectAspect);
-    jsAspect.applyAspect(Target2, objectAspect);
+    objectAspect.applyTo(Target1);
+    objectAspect.applyTo(Target2);
 
     var obj1 = new Target1();
 

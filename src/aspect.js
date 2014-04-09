@@ -275,75 +275,74 @@
     this.isStopped = true;
   };
 
-  function isFunction(obj) {
-    return obj && Object.prototype.toString.call(obj) == '[object Function]';
-  }
-
   /**
-   * The advice class is the
+   * Generic advice class.
    * @param {pointcuts} pointcut
    * @param {joinPoints} joinPoint
-   * @param {Function} fnBehaviour
+   * @param {Function} func
    * @class Advice
    * @constructor
    */
-  jsAspect.Advice = function(pointcut, joinPoint, fnBehaviour){
+  function Advice(pointcut, joinPoint, func){
      this.pointcut = pointcut;
      this.joinPoint = joinPoint;
-     this.fnBehaviour = fnBehaviour;
+     this.func = func;
   };
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
-   * @param {Function} fnBehaviour
+   * @param {Function} func
    *
    * @class BeforeAdvice
    * @extends Advice
    *
    * @constructor
    */
-  jsAspect.BeforeAdvice = function(fnBehaviour){
-     jsAspect.Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, fnBehaviour);
-  };
+  function BeforeAdvice(func){
+     Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, func);
+  }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
-   * @param {Function} fnBehaviour
+   * @param {Function} func
    *
    * @class AfterAdvice
    * @extends Advice
    *
    * @constructor
    */
-  jsAspect.AfterAdvice = function (fnBehaviour){
-    jsAspect.Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after, fnBehaviour);
-  };
+  function AfterAdvice(func) {
+    Advice.call(this, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after, func);
+  }
 
   /**
    * An aspect contains advices and the target to apply the advices to.
    * @param {Advice[]} advices
    *
    * @class Aspect
-   *
    * @constructor
    */
-  jsAspect.Aspect = function(advices){
+  function Aspect(advices){
      this.advices = advices || [];
-  };
+  }
 
   /**
-   * Applies the Aspect
+   * Applies this Aspect to the given target. One Aspect can be applied
+   * to multiple targets
    * @param target
-   * @param aspect
    */
-  jsAspect.applyAspect = function(target, aspect){
-     if(aspect instanceof jsAspect.Aspect){
-        for(var index in aspect.advices){
-           var advice = aspect.advices[index];
-           jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.fnBehaviour);
-        }
-     }
+  Aspect.prototype.applyTo = function(target) {
+    this.advices.forEach(function(advice) {
+      jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
+    });
   };
 
+  function isFunction(obj) {
+    return obj && Object.prototype.toString.call(obj) == '[object Function]';
+  }
+
+  jsAspect.BeforeAdvice = BeforeAdvice;
+  jsAspect.AfterAdvice = AfterAdvice;
+  jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
 })(window);
