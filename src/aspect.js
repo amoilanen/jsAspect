@@ -116,11 +116,11 @@
     var wrappedAdvice = function(leftAroundAdvices) {
       var oThis = this,
         nextWrappedAdvice = leftAroundAdvices.shift(),
-        args = [].slice.call(arguments, 1);
+        args = toArray(arguments).slice(1);
 
       if (nextWrappedAdvice) {
         var nextUnwrappedAdvice = function() {
-          var argsForWrapped = [].slice.call(arguments, 0);
+          var argsForWrapped = toArray(arguments);
 
           argsForWrapped.unshift(leftAroundAdvices);
           return nextWrappedAdvice.apply(oThis, argsForWrapped);
@@ -147,7 +147,7 @@
     target[methodName] = function() {
       var self = this,
         method = target[methodName],
-        args = [].slice.call(arguments, 0),
+        args = toArray(arguments),
         returnValue = undefined,
         executionContext = new ExecutionContext(target, methodName);
 
@@ -382,7 +382,7 @@
     if (arguments.length == 1) {
       this.advices = advices || [];
     } else {
-      this.advices = [].slice.call(arguments, 0);
+      this.advices = toArray(arguments);
     }
   }
 
@@ -392,7 +392,7 @@
    * @param target
    */
   Aspect.prototype.applyTo = function() {
-    var targets = [].slice.call(arguments, 0);
+    var targets = toArray(arguments);
 
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
@@ -403,6 +403,10 @@
 
   function isFunction(obj) {
     return obj && Object.prototype.toString.call(obj) == '[object Function]';
+  }
+
+  function toArray(args) {
+    return [].slice.call(args, 0);
   }
 
   jsAspect.Before = Before;
