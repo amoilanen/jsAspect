@@ -189,42 +189,31 @@ module("jsAspect.Aspect");
     deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
   });
 
-  test("jsAspect.applyAdvice: Apply aspect with inheritance", function ()
-  {
-    function Parent()
-    {}
+  test("jsAspect.applyAdvice: Apply aspect with inheritance", function() {
+    function Parent() {
+    }
 
-    Parent.prototype.method1 = function ()
-    {
+    Parent.prototype.method1 = function() {
       return "method1";
     };
 
-    function Child(gender)
-    {}
+    function Child(gender) {
+    }
 
     Child.prototype = new Parent; // make Student inherit from a Person object
     Child.prototype.constructor = Child; // fix constructor property
 
-    Child.prototype.method2 = function ()
-    {
+    Child.prototype.method2 = function() {
       return "method2";
     };
 
-    var calls = 0;
-
     var calledMethods = [];
-    var beforeAdvice = new jsAspect.Before(function (context)
-      {
-        calls++;
-        calledMethods.push({method: context.methodName, joinPoint: "before"});
-      }
-    );
-    var afterAdvice = new jsAspect.After(function ()
-      {
-        calls++;
-        calledMethods.push({joinPoint: "after"});
-      }
-    );
+    var beforeAdvice = new jsAspect.Before(function(context) {
+      calledMethods.push({method: context.methodName, joinPoint: "before"});
+    });
+    var afterAdvice = new jsAspect.After(function() {
+      calledMethods.push({joinPoint: "after"});
+    });
 
     var LoggerAspect = new jsAspect.Aspect(beforeAdvice, afterAdvice);
     LoggerAspect.settings.adviceInheritedMethods = true;
@@ -233,11 +222,9 @@ module("jsAspect.Aspect");
 
     var dude = new Child();
 
-
     equal(dude.method1(), "method1", "Starting method1");
     equal(dude.method2(), "method2", "Starting method2");
 
-    equal(calls, 4, "Advices invoked 4 times");
     deepEqual(calledMethods, [
       {method: "method1", joinPoint: "before"},
       {joinPoint: "after"},
