@@ -32,7 +32,8 @@ module("jsAspect.introduce");
         function Object() {
             this.field1 = "field1value";
         }
-      Object.prototype.method1 = function () {
+
+        Object.prototype.method1 = function () {
             return "valuefrommethod1";
         };
 
@@ -41,7 +42,7 @@ module("jsAspect.introduce");
         equal(Object.method2, undefined, "Object.method2");
         equal(Object.prototype.method2, undefined, "Object.prototype.method2");
 
-        jsAspect.introduce(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, {
+        jsAspect.introduce(Object, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS, {
             field3: "field3value",
             method2: function () {
                 return "valuefrommethod2";

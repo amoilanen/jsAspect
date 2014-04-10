@@ -5,7 +5,7 @@ module("jsAspect.afterReturning");
     test("jsAspect.inject: 'afterReturning' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         }
-      Object.prototype.wrapValue = function(value) {
+        Object.prototype.wrapValue = function(value) {
             return {value: value};
         };
         
@@ -24,7 +24,8 @@ module("jsAspect.afterReturning");
     test("jsAspect.inject: several 'afterReturning' aspects", function() {
         function Object() {
         }
-      Object.prototype.identity = function(value) {
+
+        Object.prototype.identity = function(value) {
             return value;
         };
         

@@ -19,6 +19,7 @@
       POINTCUT: {
         "METHODS": "methods",
         "PROTOTYPE_METHODS": "prototypeMethods",
+        "PROTOTYPE_OWN_METHODS": "prototypeOwnMethods",
         "METHOD" : "method"
       },
       /**
@@ -32,19 +33,6 @@
         "AFTER_THROWING": "__afterThrowing",
         "AFTER_RETURNING":"__afterReturning",
         "AROUND": "__around"
-      },
-      /**
-       * All available setting default values
-       * @enum {string}
-       * @readonly
-       */
-      "DEFAULT_ASPECT_SETTINGS": {
-        /**
-         * Flags, if the advices should be applied on inherited method, too.
-         * @type boolean
-         * @default false
-         */
-        "adviceInheritedMethods": false
       }
     },
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced";
@@ -60,7 +48,7 @@
    * @returns {Object} The target with extended properties.
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
-    target = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut) ? target.prototype : target;
+    target = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut) ? target.prototype : target;
 
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
@@ -77,42 +65,26 @@
    * @param {jsAspect.POINTCUT} pointcut The pointcut to specify or quantify the join points.
    * @param {jsAspect.JOIN_POINT} joinPoint The chosen join point to add the advice code.
    * @param {Function} advice The code, that needs to be executed at the join point.
-   * @param {String|Object} [methodNameOrSettings] The name of the method that need to be advised.
+   * @param {String} [methodName] The name of the method that need to be advised.
    * @method inject
    * @returns void
    */
-  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodNameOrSettings) {
-    if (jsAspect.POINTCUT.METHOD == pointcut) {
-      injectAdvice(target, methodNameOrSettings, advice, joinPoint);
+  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodName) {
+    var isMethodPointcut = (jsAspect.POINTCUT.METHOD == pointcut),
+      isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut),
+      isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut);
+
+    if (isMethodPointcut) {
+      injectAdvice(target, methodName, advice, joinPoint);
     } else {
-      target = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut) ? target.prototype : target;
-
-      methodNameOrSettings = initOptions(methodNameOrSettings);
-
+      target = (isPrototypeOwnMethodsPointcut || isPrototypeMethodsPointcut) ? target.prototype : target;
       for (var method in target) {
-        if (target.hasOwnProperty(method) || methodNameOrSettings.adviceInheritedMethods === true) {
+        if (target.hasOwnProperty(method) || isPrototypeMethodsPointcut) {
           injectAdvice(target, method, advice, joinPoint);
         }
       }
     }
   };
-
-  /**
-   * Initialises the possible settings
-   * @param {Object} [options]
-   * @returns {Object} Initialised settings
-   */
-  function initOptions (options){
-    if(!options){
-      options = {};
-    }
-    for(var property in jsAspect.DEFAULT_ASPECT_SETTINGS){
-      if(!options.hasOwnProperty(property)){
-         options[property] = jsAspect.DEFAULT_ASPECT_SETTINGS[property];
-      }
-    }
-    return options;
-  }
 
   /**
    * Intercepts a single method with a join point and adds an advice.
@@ -417,7 +389,6 @@
     } else {
       this.advices = toArray(arguments);
     }
-    this.settings = initOptions();
   }
 
   /**
@@ -428,10 +399,9 @@
    */
   Aspect.prototype.applyTo = function() {
     var targets = toArray(arguments);
-    var self = this;
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
-        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func, self.settings);
+        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
       });
     });
   };

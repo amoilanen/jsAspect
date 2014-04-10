@@ -5,7 +5,7 @@ module("jsAspect.afterThrowing");
     test("jsAspect.inject: 'afterThrowing' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         }
-      Object.prototype.method1 = function() {
+        Object.prototype.method1 = function() {
             throw new Error("method1exception");
         };
         
@@ -38,7 +38,8 @@ module("jsAspect.afterThrowing");
     test("jsAspect.inject: 'afterThrowing' several aspects", function() {
         function Object() {
         }
-      Object.prototype.method1 = function() {
+
+        Object.prototype.method1 = function() {
             throw new Error("method1exception");
         };
         
@@ -81,7 +82,7 @@ module("jsAspect.afterThrowing");
         
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
             function afterThrowingCallback(exception) {
-                throw new Error("callbackexception");            
+                throw new Error("callbackexception");
             }
         );
 

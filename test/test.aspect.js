@@ -189,7 +189,7 @@ module("jsAspect.Aspect");
     deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
   });
 
-  test("jsAspect.applyAdvice: Apply aspect with inheritance", function() {
+  test("jsAspect.applyAdvice: applying aspect with inheritance", function() {
     function Parent() {
     }
 
@@ -215,10 +215,8 @@ module("jsAspect.Aspect");
       calledMethods.push({joinPoint: "after"});
     });
 
-    var LoggerAspect = new jsAspect.Aspect(beforeAdvice, afterAdvice);
-    LoggerAspect.settings.adviceInheritedMethods = true;
-
-    LoggerAspect.applyTo(Child);
+    var loggerAspect = new jsAspect.Aspect(beforeAdvice, afterAdvice);
+    loggerAspect.applyTo(Child);
 
     var dude = new Child();
 
@@ -230,6 +228,6 @@ module("jsAspect.Aspect");
       {joinPoint: "after"},
       {method: "method2", joinPoint: "before"},
       {joinPoint: "after"}
-    ], "Advice information match");
+    ], "Advices applied for both the inherited and own methods");
   });
 })();

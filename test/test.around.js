@@ -5,7 +5,8 @@ module("jsAspect.around");
     test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
         }
-      Object.prototype.identity = function(x) {
+
+        Object.prototype.identity = function(x) {
             return x;
         };
         
@@ -28,7 +29,8 @@ module("jsAspect.around");
     test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut, multiple arguments in the method", function() {
         function Object() {
         }
-      Object.prototype.sum = function() {
+
+        Object.prototype.sum = function() {
             var args = [].slice.call(arguments, 0);
             
             return args.reduce(function(accumulated, current){
@@ -56,7 +58,8 @@ module("jsAspect.around");
 
         function Object() {
         }
-      Object.prototype.identity = function(x) {
+
+        Object.prototype.identity = function(x) {
             equal(obj, this, "'this' is correct in 'identity'");
             return x;
         };
