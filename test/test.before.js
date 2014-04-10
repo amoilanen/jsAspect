@@ -133,7 +133,7 @@ module("jsAspect.before");
     deepEqual(obj.accumulated, [["arg3", "arg4", "arg5"]], "Pointcut was executed before the object method but not before the prototype method");
   });
 
-  test("jsAspect.inject 'before' advice, last `context` argument contains method name", function() {
+  test("jsAspect.inject 'before' advice, `context` argument contains method name", function() {
     var obj = {
       method1: function() {
         return "method1value";
@@ -193,7 +193,7 @@ module("jsAspect.before");
     deepEqual(calledAdviceNames, ["beforeAdvice3", "beforeAdvice3"], "Remaining joinPoints have not been called");
   });
 
-  test("jsAspect.inject 'before' advice, last `context` argument contains target constructor name", function() {
+  test("jsAspect.inject 'before' advice, `context` argument contains target constructor name", function() {
     var obj = {
       method1: function() {
         return "method1value";
