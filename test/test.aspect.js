@@ -197,31 +197,48 @@ module("jsAspect.Aspect");
       return "method1";
     };
 
-    function Child(gender) {
+    function Child() {
     }
 
-    Child.prototype = new Parent(); // make Student inherit from a Person object
-    Child.prototype.constructor = Child; // fix constructor property
+    Child.prototype = new Parent();
+    Child.prototype.constructor = Child;
 
     Child.prototype.method2 = function() {
       return "method2";
     };
 
-    var calledMethods = [];
-    var beforeAdvice = new jsAspect.Before(function(context) {
+    function AnotherChild() {
+    }
+
+    AnotherChild.prototype = new Parent();
+    AnotherChild.prototype.constructor = AnotherChild;
+
+    AnotherChild.prototype.method3 = function() {
+      return "method3";
+    };
+
+    function beforeAdvice(context) {
       calledMethods.push({method: context.methodName, joinPoint: "before"});
-    });
-    var afterAdvice = new jsAspect.After(function() {
+    }
+
+    function afterAdvice() {
       calledMethods.push({joinPoint: "after"});
-    });
+    }
 
-    var loggerAspect = new jsAspect.Aspect(beforeAdvice, afterAdvice);
-    loggerAspect.applyTo(Child);
+    /*
+     * PROTOTYPE_METHODS pointcut
+     */
+    var calledMethods = [];
 
-    var dude = new Child();
+    new jsAspect.Aspect(
+      new jsAspect.Before(beforeAdvice),
+      new jsAspect.After(afterAdvice)
+    ).applyTo(Child);
 
-    equal(dude.method1(), "method1", "Starting method1");
-    equal(dude.method2(), "method2", "Starting method2");
+    var child = new Child();
+
+    equal(child.method1(), "method1", "Child method1");
+    equal(child.method2(), "method2", "Child method2");
 
     deepEqual(calledMethods, [
       {method: "method1", joinPoint: "before"},
@@ -229,5 +246,25 @@ module("jsAspect.Aspect");
       {method: "method2", joinPoint: "before"},
       {joinPoint: "after"}
     ], "Advices applied for both the inherited and own methods");
+
+    /*
+     * PROTOTYPE_OWN_METHODS pointcut
+     */
+    calledMethods = [];
+
+    new jsAspect.Aspect(
+      new jsAspect.Before(beforeAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS),
+      new jsAspect.After(afterAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
+    ).applyTo(AnotherChild);
+
+    var anotherChild = new AnotherChild();
+
+    equal(anotherChild.method1(), "method1", "AnotherChild method1");
+    equal(anotherChild.method3(), "method3", "AnotherChild method3");
+
+    deepEqual(calledMethods, [
+      {method: "method3", joinPoint: "before"},
+      {joinPoint: "after"}
+    ], "Advices applied only for own methods");
   });
 })();
