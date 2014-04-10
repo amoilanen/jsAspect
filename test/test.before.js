@@ -4,8 +4,7 @@ module("jsAspect.before");
 
   test("jsAspect.inject: 'before' advice, 'prototypeMethods' pointcut", function() {
     function Object() {
-    };
-
+    }
     Object.prototype.method1 = function() {
       return "method1value";
     };
@@ -14,7 +13,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
+    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function beforeCallback() {
         var args = [].slice.call(arguments, 1);
 
@@ -32,11 +31,10 @@ module("jsAspect.before");
 
   test("jsAspect.inject: 'before' advice, 'prototypeMethods' pointcut, object contains fields other than functions, they are left intact", function() {
     function Object() {
-    };
-
+    }
     Object.prototype.field1 = "field1value";
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
+    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function beforeCallback() {
       }
     );
@@ -50,8 +48,7 @@ module("jsAspect.before");
     var adviceNames = ["advice1", "advice2", "advice3", "advice4", "advice5"];
 
     function Object() {
-    };
-
+    }
     Object.prototype.method1 = function() {
       return "method1value";
     };
@@ -62,7 +59,7 @@ module("jsAspect.before");
 
     adviceNames.forEach(function(adviceName) {
       (function (adviceName) {
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
           function() {
             var args = [].slice.call(arguments, 1);
 
@@ -86,14 +83,13 @@ module("jsAspect.before");
 
   test("jsAspect.inject: 'before' advice is executed before method invocation", function() {
     function Object() {
-    };
-
+    }
     Object.prototype.method1 = function() {
       this.accumulated && this.accumulated.splice(0, this.accumulated.length);
       return "method1value";
     };
 
-    jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before,
+    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -110,8 +106,7 @@ module("jsAspect.before");
 
   test("jsAspect.inject 'before' advice, 'methods' pointcut", function() {
     function Object() {
-    };
-
+    }
     //Should not be enhanced with an aspect
     Object.prototype.method1 = function() {
       return "method1value";
@@ -124,7 +119,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -149,7 +144,7 @@ module("jsAspect.before");
     };
     var calledMethodNames = [];
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function(context) {
         calledMethodNames.push(context.methodName);
       }
@@ -174,18 +169,18 @@ module("jsAspect.before");
       }
     };
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         calledAdviceNames.push("beforeAdvice1");
       }
     );
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         calledAdviceNames.push("beforeAdvice2");
       }
     );
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before,
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function(context) {
         context.stop();
         calledAdviceNames.push("beforeAdvice3");
@@ -222,12 +217,12 @@ module("jsAspect.before");
 
     var calledClassNames = [];
 
-    jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.before, function(context) {
+    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 
     //An example for a own data type.
-    jsAspect.inject(Account, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.before, function(context) {
+    jsAspect.inject(Account, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
       calledClassNames.push(context.targetConstructor.name);
     });
 

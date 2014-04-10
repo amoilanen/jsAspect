@@ -148,7 +148,7 @@ module("jsAspect.Aspect");
     var aspect = new jsAspect.Aspect([
       new jsAspect.Before(function() {
         called.push(this);
-      }, jsAspect.pointcuts.methods)
+      }, jsAspect.POINTCUT.METHODS)
     ]);
 
     //Same as aspect.applyTo.apply(aspect, objects);
@@ -173,13 +173,13 @@ module("jsAspect.Aspect");
     var aspect = new jsAspect.Aspect(
       new jsAspect.Before(function() {
         called.push("advice1");
-      }, jsAspect.pointcuts.methods),
+      }, jsAspect.POINTCUT.METHODS),
       new jsAspect.Before(function() {
         called.push("advice2");
-      }, jsAspect.pointcuts.methods),
+      }, jsAspect.POINTCUT.METHODS),
       new jsAspect.Before(function() {
         called.push("advice3");
-      }, jsAspect.pointcuts.methods)
+      }, jsAspect.POINTCUT.METHODS)
     );
 
     aspect.applyTo(obj);
@@ -187,5 +187,62 @@ module("jsAspect.Aspect");
     equal(obj.method(), "methodvalue", "method is called successfully");
 
     deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
+  });
+
+  test("jsAspect.applyAdvice: Apply aspect with inheritance", function ()
+  {
+    function Parent()
+    {}
+
+    Parent.prototype.method1 = function ()
+    {
+      return "method1";
+    };
+
+    function Child(gender)
+    {}
+
+    Child.prototype = new Parent; // make Student inherit from a Person object
+    Child.prototype.constructor = Child; // fix constructor property
+
+    Child.prototype.method2 = function ()
+    {
+      return "method2";
+    };
+
+    var calls = 0;
+
+    var calledMethods = [];
+    var beforeAdvice = new jsAspect.Before(function (context)
+      {
+        calls++;
+        calledMethods.push({method: context.methodName, joinPoint: "before"});
+      }
+    );
+    var afterAdvice = new jsAspect.After(function ()
+      {
+        calls++;
+        calledMethods.push({joinPoint: "after"});
+      }
+    );
+
+    var LoggerAspect = new jsAspect.Aspect(beforeAdvice, afterAdvice);
+    LoggerAspect.settings.adviceInheritedMethods = true;
+
+    LoggerAspect.applyTo(Child);
+
+    var dude = new Child();
+
+
+    equal(dude.method1(), "method1", "Starting method1");
+    equal(dude.method2(), "method2", "Starting method2");
+
+    equal(calls, 4, "Advices invoked 4 times");
+    deepEqual(calledMethods, [
+      {method: "method1", joinPoint: "before"},
+      {joinPoint: "after"},
+      {method: "method2", joinPoint: "before"},
+      {joinPoint: "after"}
+    ], "Advice information match");
   });
 })();

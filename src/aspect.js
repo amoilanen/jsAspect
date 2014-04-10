@@ -11,44 +11,56 @@
    * http://smthngsmwhr.wordpress.com/2013/06/23/aspect-oriented-programming-in-javascript/
    */
   var jsAspect = {
-      pointcuts: {},
-      joinPoints: {}
+      /**
+       * All supported pointcuts.
+       * @enum {string}
+       * @readonly
+       */
+      POINTCUT: {
+        "METHODS": "methods",
+        "PROTOTYPE_METHODS": "prototypeMethods",
+        "METHOD" : "method"
+      },
+      /**
+       * All supported join points to join additional behavior.
+       * @enum {string}
+       * @readonly
+       */
+      JOIN_POINT: {
+        "BEFORE": "__before",
+        "AFTER": "__after",
+        "AFTER_THROWING": "__afterThrowing",
+        "AFTER_RETURNING":"__afterReturning",
+        "AROUND": "__around"
+      },
+      /**
+       * All available setting default values
+       * @enum {string}
+       * @readonly
+       */
+      "DEFAULT_ASPECT_SETTINGS": {
+        /**
+         * Flags, if the advices should be applied on inherited method, too.
+         * @type boolean
+         * @default false
+         */
+        "adviceInheritedMethods": false
+      }
     },
-    adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
+    adviceEnhancedFlagName = "__jsAspect_advice_enhanced";
 
-    /**
-     * All supported join points to join additional behavior.
-     * @enum {string}
-     * @readonly
-     */
-    allSupportedJoinPoints = ["before", "after", "afterThrowing", "afterReturning", "around"],
-
-    /**
-     * All supported pointcuts.
-     * @enum {string}
-     * @readonly
-     */
-    allPointcuts = ["methods", "prototypeMethods", "method"];
-
-  allSupportedJoinPoints.forEach(function (joinPoint) {
-    jsAspect.joinPoints[joinPoint] = "__" + joinPoint;
-  });
-  allPointcuts.forEach(function (pointcut) {
-    jsAspect.pointcuts[pointcut] = pointcut;
-  });
-
-  var DEFAULT_POINTCUT = jsAspect.pointcuts.prototypeMethods;
+  var DEFAULT_POINTCUT = jsAspect.POINTCUT.PROTOTYPE_METHODS;
 
   /**
    * Extends/Introduces additional properties like fields or function to a passed constructor or object.
    * @param {Function|Object} target The object or constructor that want to be extended
-   * @param {allPointcuts} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
+   * @param {jsAspect.POINTCUT} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
    * @param {Object} introduction The properties that want to be extended.
    * @method introduce
    * @returns {Object} The target with extended properties.
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
-    target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
+    target = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut) ? target.prototype : target;
 
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
@@ -62,25 +74,45 @@
   /**
    * Creates join points at the passed pointcut and advice name.
    * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
-   * @param {allPointcuts} pointcut The pointcut to specify or quantify the join points.
-   * @param {allSupportedJoinPoints} joinPoint The chosen join point to add the advice code.
+   * @param {jsAspect.POINTCUT} pointcut The pointcut to specify or quantify the join points.
+   * @param {jsAspect.JOIN_POINT} joinPoint The chosen join point to add the advice code.
    * @param {Function} advice The code, that needs to be executed at the join point.
-   * @param {String} [methodName] The name of the method that need to be advised.
+   * @param {String|Object} [methodNameOrSettings] The name of the method that need to be advised.
    * @method inject
    * @returns void
    */
-  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodName) {
-    if (jsAspect.pointcuts.method == pointcut) {
-      injectAdvice(target, methodName, advice, joinPoint);
+  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodNameOrSettings) {
+    if (jsAspect.POINTCUT.METHOD == pointcut) {
+      injectAdvice(target, methodNameOrSettings, advice, joinPoint);
     } else {
-      target = (jsAspect.pointcuts.prototypeMethods == pointcut) ? target.prototype : target;
+      target = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut) ? target.prototype : target;
+
+      methodNameOrSettings = initOptions(methodNameOrSettings);
+
       for (var method in target) {
-        if (target.hasOwnProperty(method)) {
+        if (target.hasOwnProperty(method) || methodNameOrSettings.adviceInheritedMethods === true) {
           injectAdvice(target, method, advice, joinPoint);
         }
       }
     }
   };
+
+  /**
+   * Initialises the possible settings
+   * @param {Object} [options]
+   * @returns {Object} Initialised settings
+   */
+  function initOptions (options){
+    if(!options){
+      options = {};
+    }
+    for(var property in jsAspect.DEFAULT_ASPECT_SETTINGS){
+      if(!options.hasOwnProperty(property)){
+         options[property] = jsAspect.DEFAULT_ASPECT_SETTINGS[property];
+      }
+    }
+    return options;
+  }
 
   /**
    * Intercepts a single method with a join point and adds an advice.
@@ -93,7 +125,7 @@
    */
   function injectAdvice(target, methodName, advice, joinPoint) {
     if (isFunction(target[methodName])) {
-      if (jsAspect.joinPoints.around == joinPoint) {
+      if (jsAspect.JOIN_POINT.AROUND == joinPoint) {
         advice = wrapAroundAdvice(advice);
       }
       if (!target[methodName][adviceEnhancedFlagName]) {
@@ -162,10 +194,10 @@
       applyAfterAdvices(self, method, args);
       return applyAfterReturningAdvices(self, method, returnValue);
     };
-    allSupportedJoinPoints.forEach(function (advice) {
-      target[methodName][jsAspect.joinPoints[advice]] = [];
-    });
-    target[methodName][jsAspect.joinPoints.around].unshift(wrapAroundAdvice(originalMethod));
+    for(var join_point in jsAspect.JOIN_POINT){
+      target[methodName][jsAspect.JOIN_POINT[join_point]] = [];
+    }
+    target[methodName][jsAspect.JOIN_POINT.AROUND].unshift(wrapAroundAdvice(originalMethod));
   }
 
   /**
@@ -177,7 +209,7 @@
    * @method applyBeforeAdvices
    */
   function applyBeforeAdvices(context, method, args, executionContext) {
-    var beforeAdvices = method[jsAspect.joinPoints.before];
+    var beforeAdvices = method[jsAspect.JOIN_POINT.BEFORE];
 
     beforeAdvices.forEach(function (advice) {
       var adviceArguments = args.slice();
@@ -200,8 +232,8 @@
    * @returns {Function|Object}
    */
   function applyAroundAdvices(context, method, args) {
-    var aroundAdvices = method[jsAspect.joinPoints.around]
-        .slice(0, method[jsAspect.joinPoints.around].length),
+    var aroundAdvices = method[jsAspect.JOIN_POINT.AROUND]
+        .slice(0, method[jsAspect.JOIN_POINT.AROUND].length),
       firstAroundAdvice = aroundAdvices.shift(),
       argsForAroundAdvicesChain = args.slice();
 
@@ -218,7 +250,7 @@
    * @private
    */
   function applyAfterThrowingAdvices(context, method, exception) {
-    var afterThrowingAdvices = method[jsAspect.joinPoints.afterThrowing];
+    var afterThrowingAdvices = method[jsAspect.JOIN_POINT.AFTER_THROWING];
 
     afterThrowingAdvices.forEach(function (advice) {
       advice.call(context, exception);
@@ -233,7 +265,7 @@
    * @method applyAfterAdvices
    */
   function applyAfterAdvices(context, method, args) {
-    var afterAdvices = method[jsAspect.joinPoints.after];
+    var afterAdvices = method[jsAspect.JOIN_POINT.AFTER];
 
     afterAdvices.forEach(function (advice) {
       advice.apply(context, args);
@@ -242,14 +274,13 @@
 
   /**
    * Adds the join point to add behaviour <i>after</i> the method returned a value or the method stopped working (no return value).
-   * @param context
    * @param method
    * @param returnValue
    * @method applyAfterReturningAdvices
    * @returns {Object}
    */
   function applyAfterReturningAdvices(context, method, returnValue) {
-    var afterReturningAdvices = method[jsAspect.joinPoints.afterReturning];
+    var afterReturningAdvices = method[jsAspect.JOIN_POINT.AFTER_RETURNING];
 
     return afterReturningAdvices.reduce(function (acc, current) {
       return current(acc);
@@ -269,6 +300,8 @@
     this.isStopped = false;
   }
 
+
+
   /**
    * Can be used to stop the method execution. For example:
    * <ul>
@@ -285,9 +318,9 @@
 
   /**
    * Generic advice class.
-   * @param {pointcuts} pointcut
-   * @param {joinPoints} joinPoint
-   * @param {Function} func
+   * @param {POINTCUT} [pointcut]
+   * @param {JOIN_POINT} joinPoint
+   * @param {function(Object, ...)} func
    * @class Advice
    * @constructor
    */
@@ -298,12 +331,12 @@
     this.pointcut = pointcut;
     this.joinPoint = joinPoint;
     this.func = func;
-  };
+  }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
-   * @param {Function} func
-   * @param {pointcut} pointcut
+   * @param {function(Object, ...)} func
+   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class Before
    * @extends Advice
@@ -311,13 +344,13 @@
    * @constructor
    */
   function Before(func, pointcut) {
-     Advice.call(this, pointcut, jsAspect.joinPoints.before, func);
+     Advice.call(this, pointcut, jsAspect.JOIN_POINT.BEFORE, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
-   * @param {Function} func
-   * @param {pointcut} pointcut
+   * @param {function(Object, ...)} func
+   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class After
    * @extends Advice
@@ -325,13 +358,13 @@
    * @constructor
    */
   function After(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.joinPoints.after, func);
+    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
-   * @param {Function} func
-   * @param {pointcut} pointcut
+   * @param {function(Object, ...)} func
+   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class AfterReturning
    * @extends Advice
@@ -339,13 +372,13 @@
    * @constructor
    */
   function AfterReturning(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.joinPoints.afterReturning, func);
+    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER_RETURNING, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
-   * @param {Function} func
-   * @param {pointcut} pointcut
+   * @param {function(Object, ...)} func
+   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class AfterThrowing
    * @extends Advice
@@ -353,13 +386,13 @@
    * @constructor
    */
   function AfterThrowing(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.joinPoints.afterThrowing, func);
+    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER_THROWING, func);
   }
 
   /**
    * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
-   * @param {Function} func
-   * @param {pointcut} pointcut
+   * @param {function(Object, ...)} func
+   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class Around
    * @extends Advice
@@ -367,13 +400,13 @@
    * @constructor
    */
   function Around(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.joinPoints.around, func);
+    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AROUND, func);
   }
 
   /**
    * An aspect contains advices and the target to apply the advices to.
    * Advices can be passed both as an array and specified as arguments to the constructor.
-   * @param advices
+   * @param {Advice|Advice[]} advices
    *
    * @class Aspect
    * @constructor
@@ -384,19 +417,21 @@
     } else {
       this.advices = toArray(arguments);
     }
+    this.settings = initOptions();
   }
 
   /**
    * Applies this Aspect to the given target. If called with several arguments the Aspect
    * will be applied to each one of them
-   * @param target
+   * @param {...Advice}
+   * @method applyTo
    */
   Aspect.prototype.applyTo = function() {
     var targets = toArray(arguments);
-
+    var self = this;
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
-        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
+        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func, self.settings);
       });
     });
   };

@@ -4,9 +4,8 @@ module("jsAspect.around");
     
     test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
-        };
-        
-        Object.prototype.identity = function(x) {
+        }
+      Object.prototype.identity = function(x) {
             return x;
         };
         
@@ -14,7 +13,7 @@ module("jsAspect.around");
             return x - 1;
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func, x) {
                 return 2 * func(x);
             }
@@ -28,9 +27,8 @@ module("jsAspect.around");
 
     test("jsAspect.inject: 'around' advice, 'prototypeMethods' pointcut, multiple arguments in the method", function() {
         function Object() {
-        };
-        
-        Object.prototype.sum = function() {
+        }
+      Object.prototype.sum = function() {
             var args = [].slice.call(arguments, 0);
             
             return args.reduce(function(accumulated, current){
@@ -38,7 +36,7 @@ module("jsAspect.around");
             });
         };
 
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func) {
                 var args = [].slice.call(arguments, 1),
                     sum = func.apply(this, args);
@@ -57,9 +55,8 @@ module("jsAspect.around");
         var obj = new Object();
 
         function Object() {
-        };
-        
-        Object.prototype.identity = function(x) {
+        }
+      Object.prototype.identity = function(x) {
             equal(obj, this, "'this' is correct in 'identity'");
             return x;
         };
@@ -69,19 +66,19 @@ module("jsAspect.around");
             return x - 1;
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 1");
                 return 2 * func(x);
             }
         );
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 2");
                 return 3 * func(x);
             }
         );
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.around,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func, x) {
                 equal(obj, this, "'this' is correct in advice 3");
                 return 4 * func(x);
@@ -94,9 +91,8 @@ module("jsAspect.around");
     
     test("jsAspect.inject: 'around' advice, 'self' pointcut", function() {
         function Object() {
-        };
-        
-        Object.prototype.identity = function(x) {
+        }
+      Object.prototype.identity = function(x) {
             return x;
         };
 
@@ -106,7 +102,7 @@ module("jsAspect.around");
             return 2 * x;
         };
         
-        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.around,
+        jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.AROUND,
             function aroundCallback(func, x) {
                 return func(x) - 1;
             }
