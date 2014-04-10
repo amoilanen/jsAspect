@@ -200,7 +200,7 @@ module("jsAspect.Aspect");
     function Child(gender) {
     }
 
-    Child.prototype = new Parent; // make Student inherit from a Person object
+    Child.prototype = new Parent(); // make Student inherit from a Person object
     Child.prototype.constructor = Child; // fix constructor property
 
     Child.prototype.method2 = function() {

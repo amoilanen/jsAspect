@@ -48,7 +48,8 @@
    * @returns {Object} The target with extended properties.
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
-    target = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut) ? target.prototype : target;
+    target = ((jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut)
+        || (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut)) ? target.prototype : target;
 
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
