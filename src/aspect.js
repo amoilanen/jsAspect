@@ -415,11 +415,13 @@
     return [].slice.call(args, 0);
   }
 
-  jsAspect.Before = Before;
-  jsAspect.After = After;
-  jsAspect.AfterReturning = AfterReturning;
-  jsAspect.AfterThrowing = AfterThrowing;
-  jsAspect.Around = Around;
+  jsAspect.Advice = {
+    Before: Before,
+    After: After,
+    AfterReturning: AfterReturning,
+    AfterThrowing: AfterThrowing,
+    Around: Around
+  },
   jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
 })(window);

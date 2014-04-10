@@ -15,7 +15,7 @@ module("jsAspect.Aspect");
 
     var called = [];
 
-    var aspect = new jsAspect.Aspect([new jsAspect.Before(function (context) {
+    var aspect = new jsAspect.Aspect([new jsAspect.Advice.Before(function (context) {
       called.push({method: context.methodName, constructor: context.targetConstructor.name});
     })]);
 
@@ -45,14 +45,14 @@ module("jsAspect.Aspect");
     var called = [];
 
     var aspect = new jsAspect.Aspect([
-      new jsAspect.Before(function(context) {
+      new jsAspect.Advice.Before(function(context) {
         called.push({
           method: context.methodName,
           constructor: context.targetConstructor.name, 
           joinPoint: "before"
         });
       }),
-      new jsAspect.After(function() {
+      new jsAspect.Advice.After(function() {
         called.push({joinPoint: "after"});
       })
     ]);
@@ -94,14 +94,14 @@ module("jsAspect.Aspect");
     var called = [];
 
     var aspect = new jsAspect.Aspect([
-      new jsAspect.Before(function(context) {
+      new jsAspect.Advice.Before(function(context) {
         called.push({
           method: context.methodName,
           constructor: context.targetConstructor.name,
           joinPoint: "before"
         });
       }),
-      new jsAspect.After(function() {
+      new jsAspect.Advice.After(function() {
         called.push({joinPoint: "after"});
       })
     ]);
@@ -146,7 +146,7 @@ module("jsAspect.Aspect");
     var called = [];
 
     var aspect = new jsAspect.Aspect([
-      new jsAspect.Before(function() {
+      new jsAspect.Advice.Before(function() {
         called.push(this);
       }, jsAspect.POINTCUT.METHODS)
     ]);
@@ -171,13 +171,13 @@ module("jsAspect.Aspect");
     var called = [];
 
     var aspect = new jsAspect.Aspect(
-      new jsAspect.Before(function() {
+      new jsAspect.Advice.Before(function() {
         called.push("advice1");
       }, jsAspect.POINTCUT.METHODS),
-      new jsAspect.Before(function() {
+      new jsAspect.Advice.Before(function() {
         called.push("advice2");
       }, jsAspect.POINTCUT.METHODS),
-      new jsAspect.Before(function() {
+      new jsAspect.Advice.Before(function() {
         called.push("advice3");
       }, jsAspect.POINTCUT.METHODS)
     );
@@ -231,8 +231,8 @@ module("jsAspect.Aspect");
     var calledMethods = [];
 
     new jsAspect.Aspect(
-      new jsAspect.Before(beforeAdvice),
-      new jsAspect.After(afterAdvice)
+      new jsAspect.Advice.Before(beforeAdvice),
+      new jsAspect.Advice.After(afterAdvice)
     ).applyTo(Child);
 
     var child = new Child();
@@ -253,8 +253,8 @@ module("jsAspect.Aspect");
     calledMethods = [];
 
     new jsAspect.Aspect(
-      new jsAspect.Before(beforeAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS),
-      new jsAspect.After(afterAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
+      new jsAspect.Advice.Before(beforeAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS),
+      new jsAspect.Advice.After(afterAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
     ).applyTo(AnotherChild);
 
     var anotherChild = new AnotherChild();
