@@ -4,9 +4,8 @@ module("jsAspect.after");
     
     test("jsAspect.inject: 'after' advice, 'prototypeMethods' pointcut", function() {
         function Object() {
-        };
-        
-        Object.prototype.method1 = function() {
+        }
+      Object.prototype.method1 = function() {
             return "method1value";
         };
         
@@ -14,7 +13,7 @@ module("jsAspect.after");
             return "method2value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
             function afterCallback() {
                 var args = [].slice.call(arguments, 0);
 
@@ -32,11 +31,10 @@ module("jsAspect.after");
 
     test("jsAspect.inject: 'after' advice, 'prototypeMethods' pointcut, object contains fields other than functions, they are left intact", function() {
         function Object() {
-        };
-
-        Object.prototype.field1 = "field1value";
+        }
+      Object.prototype.field1 = "field1value";
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
             function afterCallback() {
             }
         );
@@ -50,9 +48,8 @@ module("jsAspect.after");
         var adviceNames = ["advice1", "advice2", "advice3", "advice4", "advice5"];
         
         function Object() {
-        };
-        
-        Object.prototype.method1 = function() {
+        }
+      Object.prototype.method1 = function() {
             return "method1value";
         };
         
@@ -62,7 +59,7 @@ module("jsAspect.after");
         
         adviceNames.forEach(function(adviceName) {
             (function (adviceName) {
-                jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
+                jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
                     function() {
                         var args = [].slice.call(arguments, 0);
 
@@ -86,14 +83,14 @@ module("jsAspect.after");
 
     test("jsAspect.inject: 'after' advice is executed after method invocation", function() {
         function Object() {
-        };
+        }
         
         Object.prototype.method1 = function() {
             this.accumulated && this.accumulated.splice(0, this.accumulated.length);
             return "method1value";
         };
         
-        jsAspect.inject(Object, jsAspect.pointcuts.prototypeMethods, jsAspect.joinPoints.after,
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
             function() {
                 var args = [].slice.call(arguments, 0);
             
@@ -110,9 +107,8 @@ module("jsAspect.after");
     
     test("jsAspect.inject 'after' advice, 'methods' pointcut", function() {
         function Object() {
-        };
-        
-        //Should not be enhanced with an aspect
+        }
+      //Should not be enhanced with an aspect
         Object.prototype.method1 = function() {
             return "method1value";
         };
@@ -124,7 +120,7 @@ module("jsAspect.after");
             return "method2value";
         };
 
-        jsAspect.inject(obj, jsAspect.pointcuts.methods, jsAspect.joinPoints.after,
+        jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.AFTER,
             function() {
                 var args = [].slice.call(arguments, 0);
             
