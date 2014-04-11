@@ -267,4 +267,50 @@ module("jsAspect.Aspect");
       {joinPoint: "after"}
     ], "Advices applied only for own methods");
   });
+
+  test("jsAspect.applyAdvice: Arguments in the context", function ()
+  {
+    function Class()
+    {
+    }
+
+    Class.prototype.method1= function(param1)
+    {
+      return param1 + "-method1"
+    };
+
+
+    function beforeAdvice(context)
+    {
+      calledMethods.push({method: context.method.name, joinPoint: "before", args: context.method.arguments});
+    }
+
+    function afterAdvice()
+    {
+      console.log(arguments);
+      calledMethods.push({joinPoint: "after"});
+    }
+
+    /*
+     * PROTOTYPE_METHODS pointcut
+     */
+    var calledMethods = [];
+
+    new jsAspect.Aspect(
+      new jsAspect.Advice.Before(beforeAdvice),
+      new jsAspect.Advice.After(afterAdvice)
+    ).applyTo(Class);
+
+    var child = new Class();
+
+    equal(child.method1("test"), "test-method1", "Child method1");
+    console.log(calledMethods);
+
+    deepEqual(calledMethods, [
+      {method: "method1", joinPoint: "before", args: ["test"] },
+      {joinPoint: "after"},
+    ], "Advices applied for both the inherited and own methods");
+
+  });
+
 })();
