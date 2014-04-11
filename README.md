@@ -192,4 +192,4 @@ Trace: MyClass --> method1 with parameter
 */
 ```
 
-And this gives you the ability to create a nice logger.
+This gives you the ability to create a nice logger.

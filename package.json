@@ -1,0 +1,35 @@
+{
+  "name": "jsAspect",
+  "version": "0.5.0",
+  "description": "Aspect-oriented framework for JavaScript",
+  "directories": {
+    "lib":"lib",
+    "src":"src",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/antivanov/jsAspect.git"
+  },
+  "keywords": [
+    "aspect-oriented",
+    "javascript"
+  ],
+  "author": "Anton Ivanov",
+  "contributors": [
+    {
+      "name": "Konstantin Krassmann",
+      "email": "kkonstantin@gmx.de"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/antivanov/jsAspect/issues"
+  },
+  "dependencies": {
+    "bower":"*",
+    "grunt":"*",
+    "grunt-contrib-uglify":"*",
+    "grunt-contrib-qunit":"*"
+  }
+}
