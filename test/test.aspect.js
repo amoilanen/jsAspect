@@ -20,7 +20,7 @@ module("jsAspect.Aspect", {
     };
 
     var aspect = new jsAspect.Aspect([new jsAspect.Advice.Before(function (context) {
-      self.called.push({method: context.method.name, constructor: context.targetConstructor.name});
+      self.called.push({method: context.method.name, constructor: context.target.constructor.name});
     })]);
 
     aspect.applyTo(Target);
@@ -52,7 +52,7 @@ module("jsAspect.Aspect", {
       new jsAspect.Advice.Before(function(context) {
         self.called.push({
           method: context.method.name,
-          constructor: context.targetConstructor.name, 
+          constructor: context.target.constructor.name, 
           joinPoint: "before"
         });
       }),
@@ -101,7 +101,7 @@ module("jsAspect.Aspect", {
       new jsAspect.Advice.Before(function(context) {
         self.called.push({
           method: context.method.name,
-          constructor: context.targetConstructor.name,
+          constructor: context.target.constructor.name,
           joinPoint: "before"
         });
       }),

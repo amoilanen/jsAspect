@@ -268,11 +268,10 @@
    */
   function ExecutionContext(target, methodName, args) {
     this.target = target;
-    this.method ={
-      "name":methodName,
+    this.method = {
+      "name": methodName,
       "arguments": args
     };
-    this.targetConstructor = target.constructor;
     this.isStopped = false;
   }
 
@@ -388,11 +387,7 @@
    * @constructor
    */
   function Aspect(advices) {
-    if (advices instanceof Array) {
-      this.advices = advices || [];
-    } else {
-      this.advices = toArray(arguments);
-    }
+    this.advices = (advices instanceof Array) ? advices : toArray(arguments);
   }
 
   /**

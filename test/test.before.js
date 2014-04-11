@@ -218,12 +218,12 @@ module("jsAspect.before");
     var calledClassNames = [];
 
     jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
-      calledClassNames.push(context.targetConstructor.name);
+      calledClassNames.push(context.target.constructor.name);
     });
 
     //An example for a own data type.
     jsAspect.inject(Account, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
-      calledClassNames.push(context.targetConstructor.name);
+      calledClassNames.push(context.target.constructor.name);
     });
 
     var acc = new Account();
