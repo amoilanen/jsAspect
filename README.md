@@ -92,9 +92,10 @@ target.method1();
 //logs: `joinPoint after`
 //logs: `joinPoint before`
 ```
-> HINT: Place methods on the prototype of a constructor. If you place them directly into the constructor we will not be able to override these methods. For example
-__will not work as you might expect:__
-``` javascript
+> HINT: Place methods on the prototype of a constructor. If you place them directly into the constructor we will not be able to override these methods.
+
+For example, this __will not work as you might expect:__
+```javascript
 function Target(){
     this.method1 = function() {
         return "method1value";
