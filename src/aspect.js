@@ -388,7 +388,7 @@
    * @constructor
    */
   function Aspect(advices) {
-    if (arguments.length == 1) {
+    if (advices instanceof Array) {
       this.advices = advices || [];
     } else {
       this.advices = toArray(arguments);

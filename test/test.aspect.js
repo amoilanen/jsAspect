@@ -1,8 +1,14 @@
-module("jsAspect.Aspect");
+module("jsAspect.Aspect", {
+  setup: function() {
+    this.called = [];
+  }
+});
 
 (function() {
 
   test("jsAspect.Aspect.applyTo: applying advice", function() {
+    var self = this;
+
     function Target(){
     }
 
@@ -13,10 +19,8 @@ module("jsAspect.Aspect");
       return "method2value";
     };
 
-    var called = [];
-
     var aspect = new jsAspect.Aspect([new jsAspect.Advice.Before(function (context) {
-      called.push({method: context.method.name, constructor: context.targetConstructor.name});
+      self.called.push({method: context.method.name, constructor: context.targetConstructor.name});
     })]);
 
     aspect.applyTo(Target);
@@ -26,13 +30,15 @@ module("jsAspect.Aspect");
     equal(obj.method1(), "method1value", "method1 successful");
     equal(obj.method2(), "method2value", "method2 successful");
 
-    deepEqual(called, [
+    deepEqual(this.called, [
       {method: "method1", constructor: "Target"},
       {method: "method2", constructor: "Target"}
     ], "Advice invoked");
   });
 
   test("jsAspect.Aspect.applyTo: applying multiple advices", function() {
+    var self = this;
+
     function Target(){}
 
     Target.prototype.method1 = function() {
@@ -42,18 +48,16 @@ module("jsAspect.Aspect");
       return "method2value";
     };
 
-    var called = [];
-
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function(context) {
-        called.push({
+        self.called.push({
           method: context.method.name,
           constructor: context.targetConstructor.name, 
           joinPoint: "before"
         });
       }),
       new jsAspect.Advice.After(function() {
-        called.push({joinPoint: "after"});
+        self.called.push({joinPoint: "after"});
       })
     ]);
 
@@ -64,7 +68,7 @@ module("jsAspect.Aspect");
     equal(obj.method1(), "method1value", "method1 successful");
     equal(obj.method2(), "method2value", "method2 successful");
 
-    deepEqual(called, [
+    deepEqual(this.called, [
       {method: "method1", constructor: "Target", joinPoint:"before"},
       {joinPoint:"after"},
       {method: "method2", constructor: "Target", joinPoint: "before"},
@@ -73,6 +77,8 @@ module("jsAspect.Aspect");
   });
 
   test("jsAspect.Aspect.applyTo: multiple objects", function() {
+    var self = this;
+
     function Target1(){}
 
     Target1.prototype.method1 = function() {
@@ -91,18 +97,16 @@ module("jsAspect.Aspect");
       return "target2method2value";
     };
 
-    var called = [];
-
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function(context) {
-        called.push({
+        self.called.push({
           method: context.method.name,
           constructor: context.targetConstructor.name,
           joinPoint: "before"
         });
       }),
       new jsAspect.Advice.After(function() {
-        called.push({joinPoint: "after"});
+        self.called.push({joinPoint: "after"});
       })
     ]);
 
@@ -113,7 +117,7 @@ module("jsAspect.Aspect");
 
     equal(obj1.method1(), "target1method1value", "obj1 method1 successful");
     equal(obj1.method2(), "target1method2value", "obj1 method2 successful");
-    deepEqual(called, [
+    deepEqual(this.called, [
       {method: "method1", constructor: "Target1", joinPoint: "before"},
       {joinPoint: "after"},
       {method: "method2", constructor: "Target1", joinPoint: "before"},
@@ -121,12 +125,12 @@ module("jsAspect.Aspect");
     ], "Advice on first constructor invoked");
 
 
-    called = [];
+    this.called = [];
     var obj2 = new Target2();
 
     equal(obj2.method1(), "target2method1value", "obj2 method1 successful");
     equal(obj2.method2(), "target2method2value", "obj2 method2 successful");
-    deepEqual(called, [
+    deepEqual(this.called, [
       {method: "method1", constructor: "Target2", joinPoint: "before"},
       {joinPoint: "after"},
       {method: "method2", constructor: "Target2", joinPoint: "before"},
@@ -135,6 +139,8 @@ module("jsAspect.Aspect");
   });
 
   test("jsAspect.Aspect.applyTo: can take multiple arguments", function() {
+    var self = this;
+
     function Target() {
       this.method = function() {
         return "methodvalue";
@@ -143,11 +149,9 @@ module("jsAspect.Aspect");
 
     var objects = [new Target(), new Target(), new Target()];
 
-    var called = [];
-
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function() {
-        called.push(this);
+        self.called.push(this);
       }, jsAspect.POINTCUT.METHODS)
     ]);
 
@@ -158,27 +162,27 @@ module("jsAspect.Aspect");
       equal(obj.method(), "methodvalue", "object " + idx + " method successful");
     });
 
-    deepEqual(called, objects, "Aspect was applied for all objects");
+    deepEqual(this.called, objects, "Aspect was applied for all objects");
   });
 
   test("jsAspect.Aspect: constructor can take multiple arguments", function() {
+    var self = this;
+
     var obj = {
       method: function() {
         return "methodvalue";
       }
     };
 
-    var called = [];
-
     var aspect = new jsAspect.Aspect(
       new jsAspect.Advice.Before(function() {
-        called.push("advice1");
+        self.called.push("advice1");
       }, jsAspect.POINTCUT.METHODS),
       new jsAspect.Advice.Before(function() {
-        called.push("advice2");
+        self.called.push("advice2");
       }, jsAspect.POINTCUT.METHODS),
       new jsAspect.Advice.Before(function() {
-        called.push("advice3");
+        self.called.push("advice3");
       }, jsAspect.POINTCUT.METHODS)
     );
 
@@ -186,10 +190,12 @@ module("jsAspect.Aspect");
 
     equal(obj.method("test"), "methodvalue", "method is called successfully");
 
-    deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
+    deepEqual(this.called, ["advice3", "advice2", "advice1"], "Advices were all applied");
   });
 
   test("jsAspect.applyAdvice: applying aspect with inheritance", function() {
+    var self = this;
+
     function Parent() {
     }
 
@@ -218,17 +224,12 @@ module("jsAspect.Aspect");
     };
 
     function beforeAdvice(context) {
-      calledMethods.push({method: context.method.name, joinPoint: "before"});
+      self.called.push({method: context.method.name, joinPoint: "before"});
     }
 
     function afterAdvice() {
-      calledMethods.push({joinPoint: "after"});
+      self.called.push({joinPoint: "after"});
     }
-
-    /*
-     * PROTOTYPE_METHODS pointcut
-     */
-    var calledMethods = [];
 
     new jsAspect.Aspect(
       new jsAspect.Advice.Before(beforeAdvice),
@@ -240,7 +241,7 @@ module("jsAspect.Aspect");
     equal(child.method1(), "method1", "Child method1");
     equal(child.method2(), "method2", "Child method2");
 
-    deepEqual(calledMethods, [
+    deepEqual(this.called, [
       {method: "method1", joinPoint: "before"},
       {joinPoint: "after"},
       {method: "method2", joinPoint: "before"},
@@ -250,7 +251,7 @@ module("jsAspect.Aspect");
     /*
      * PROTOTYPE_OWN_METHODS pointcut
      */
-    calledMethods = [];
+    this.called = [];
 
     new jsAspect.Aspect(
       new jsAspect.Advice.Before(beforeAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS),
@@ -262,54 +263,36 @@ module("jsAspect.Aspect");
     equal(anotherChild.method1(), "method1", "AnotherChild method1");
     equal(anotherChild.method3(), "method3", "AnotherChild method3");
 
-    deepEqual(calledMethods, [
+    deepEqual(this.called, [
       {method: "method3", joinPoint: "before"},
       {joinPoint: "after"}
     ], "Advices applied only for own methods");
   });
 
-  test("jsAspect.applyAdvice: Arguments in the context", function ()
-  {
-    function Class()
-    {
+  test("jsAspect.applyAdvice: arguments in the context", function() {
+    var self = this;
+
+    function Target() {
     }
 
-    Class.prototype.method1= function(param1)
-    {
-      return param1 + "-method1"
+    Target.prototype.method1 = function() {
+      return [].slice.call(arguments, 0).join("-") + "-method1"
     };
 
-
-    function beforeAdvice(context)
-    {
-      calledMethods.push({method: context.method.name, joinPoint: "before", args: context.method.arguments});
-    }
-
-    function afterAdvice()
-    {
-      console.log(arguments);
-      calledMethods.push({joinPoint: "after"});
-    }
-
-    /*
-     * PROTOTYPE_METHODS pointcut
-     */
-    var calledMethods = [];
-
     new jsAspect.Aspect(
-      new jsAspect.Advice.Before(beforeAdvice),
-      new jsAspect.Advice.After(afterAdvice)
-    ).applyTo(Class);
+      new jsAspect.Advice.Before(function(context) {
+        self.called.push({method: context.method.name, joinPoint: "before", args: context.method.arguments});
+      })
+    ).applyTo(Target);
 
-    var child = new Class();
+    var obj = new Target();
 
-    equal(child.method1("test"), "test-method1", "Child method1");
-    console.log(calledMethods);
+    equal(obj.method1("paramvalue1", "paramvalue2", "paramvalue3"),
+      "paramvalue1-paramvalue2-paramvalue3-method1", "obj method1");
 
-    deepEqual(calledMethods, [
-      {method: "method1", joinPoint: "before", args: ["test"] },
-      {joinPoint: "after"},
-    ], "Advices applied for both the inherited and own methods");
+    deepEqual(this.called, [
+      {method: "method1", joinPoint: "before", args: ["paramvalue1", "paramvalue2", "paramvalue3"]}
+    ], "Method arguments are available in the context");
 
   });
 
