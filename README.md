@@ -137,5 +137,51 @@ target.method1();
 //logs: `joinPoint after`
 //logs: `joinPoint before`
 ``` 
+### The `context` parameter
+The `context` parameter is currently passed to the `before` advices. 
+It provides information about the adviced method itself and the object/constructor the aspect was applied to. 
+This is useful, eg. if you'r building a logger aspect. 
+
+Usage: 
+
+``` javascript
+//Define behaviour of the beforeAdvice
+var beforeAdviceBehaviour = function(context) {
+   console.log(context.target); //object/constructor, the aspect was applied to
+   console.log(context.method.name); //the method's name, which is intercepted by this method.
+   console.log(context.method.arguments); //the method were passed to the method
+};
+```
 
 
+In some cases you want to log the constructor's name. Since there is no cross-browser solution to achieve this, we recomment to place a additional attribute containing the name of the constructor and access this attribute with the `context`: 
+
+
+``` javascript
+function Class()
+{
+}
+Class.prototype.__name = "MyClass"; // The attribute
+Class.prototype.method1= function(param1)
+{
+  return param1 + "-method1"
+};
+
+var beforeAdviceBehaviour = function(context) {
+   console.log("Trace:", context.target.__name, "-->", context.method.name, " with parameter");
+   console.log(context.method.arguments);
+};
+var beforeAdvice = new jsAspect.Advice.Before(beforeAdviceBehaviour);
+var aspect = new jsAspect.Aspect([beforeAdvice]);
+
+var class = new Class();
+class.method1("ParamValue");
+
+//this will log: 
+/**
+Trace: MyClass --> method1 with parameter
+["ParamValue"]
+*/
+```
+
+This gives you the ability to create a nice logger.
