@@ -16,7 +16,7 @@ module("jsAspect.Aspect");
     var called = [];
 
     var aspect = new jsAspect.Aspect([new jsAspect.Advice.Before(function (context) {
-      called.push({method: context.methodName, constructor: context.targetConstructor.name});
+      called.push({method: context.method.name, constructor: context.targetConstructor.name});
     })]);
 
     aspect.applyTo(Target);
@@ -47,7 +47,7 @@ module("jsAspect.Aspect");
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function(context) {
         called.push({
-          method: context.methodName,
+          method: context.method.name,
           constructor: context.targetConstructor.name, 
           joinPoint: "before"
         });
@@ -96,7 +96,7 @@ module("jsAspect.Aspect");
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function(context) {
         called.push({
-          method: context.methodName,
+          method: context.method.name,
           constructor: context.targetConstructor.name,
           joinPoint: "before"
         });
@@ -184,7 +184,7 @@ module("jsAspect.Aspect");
 
     aspect.applyTo(obj);
 
-    equal(obj.method(), "methodvalue", "method is called successfully");
+    equal(obj.method("test"), "methodvalue", "method is called successfully");
 
     deepEqual(called, ["advice3", "advice2", "advice1"], "Advices were all applied");
   });
@@ -218,7 +218,7 @@ module("jsAspect.Aspect");
     };
 
     function beforeAdvice(context) {
-      calledMethods.push({method: context.methodName, joinPoint: "before"});
+      calledMethods.push({method: context.method.name, joinPoint: "before"});
     }
 
     function afterAdvice() {
