@@ -38,9 +38,10 @@
     "url": "https://github.com/antivanov/jsAspect/issues"
   },
   "devDependencies": {
-    "bower":"*",
-    "grunt":"*",
-    "grunt-contrib-uglify":"*",
-    "grunt-contrib-qunit":"*"
+    "bower": "*",
+    "grunt": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-qunit": "*",
+    "grunt-contrib-jshint": "*"
   }
 }

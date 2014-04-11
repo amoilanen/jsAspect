@@ -48,8 +48,7 @@
    * @returns {Object} The target with extended properties.
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
-    target = ((jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut)
-        || (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut)) ? target.prototype : target;
+    target = ((jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut) || (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut)) ? target.prototype : target;
 
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
@@ -71,9 +70,9 @@
    * @returns void
    */
   jsAspect.inject = function (target, pointcut, joinPoint, advice, methodName) {
-    var isMethodPointcut = (jsAspect.POINTCUT.METHOD == pointcut),
-      isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS == pointcut),
-      isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS == pointcut);
+    var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcut),
+      isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut),
+      isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut);
 
     if (isMethodPointcut) {
       injectAdvice(target, methodName, advice, joinPoint);
@@ -98,7 +97,7 @@
    */
   function injectAdvice(target, methodName, advice, joinPoint) {
     if (isFunction(target[methodName])) {
-      if (jsAspect.JOIN_POINT.AROUND == joinPoint) {
+      if (jsAspect.JOIN_POINT.AROUND === joinPoint) {
         advice = wrapAroundAdvice(advice);
       }
       if (!target[methodName][adviceEnhancedFlagName]) {
@@ -153,7 +152,7 @@
       var self = this,
         method = target[methodName],
         args = toArray(arguments),
-        returnValue = undefined;
+        returnValue;
       var  executionContext = new ExecutionContext(target, methodName, args);
 
       applyBeforeAdvices(self, method, args, executionContext);
@@ -300,7 +299,7 @@
    * @constructor
    */
   function Advice(pointcut, joinPoint, func) {
-    if (pointcut == (void 0)) {
+    if (pointcut === (void 0)) {
         pointcut = DEFAULT_POINTCUT;
     }
     this.pointcut = pointcut;
@@ -406,7 +405,7 @@
   };
 
   function isFunction(obj) {
-    return obj && Object.prototype.toString.call(obj) == '[object Function]';
+    return obj && Object.prototype.toString.call(obj) === '[object Function]';
   }
 
   function toArray(args) {
@@ -422,4 +421,4 @@
   };
   jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
-})(window);
+})(this);
