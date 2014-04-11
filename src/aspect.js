@@ -153,8 +153,8 @@
       var self = this,
         method = target[methodName],
         args = toArray(arguments),
-        returnValue = undefined,
-        executionContext = new ExecutionContext(target, methodName);
+        returnValue = undefined;
+      var  executionContext = new ExecutionContext(target, methodName, args);
 
       applyBeforeAdvices(self, method, args, executionContext);
       if (executionContext.isStopped) return;
@@ -178,7 +178,7 @@
    * @param context
    * @param method
    * @param args
-   * @param executionContext
+   * @param {ExecutionContext} executionContext
    * @method applyBeforeAdvices
    */
   function applyBeforeAdvices(context, method, args, executionContext) {
@@ -266,9 +266,12 @@
    * @param methodName
    * @constructor
    */
-  function ExecutionContext(target, methodName) {
+  function ExecutionContext(target, methodName, args) {
     this.target = target;
-    this.methodName = methodName;
+    this.method ={
+      "name":methodName,
+      "arguments": args
+    };
     this.targetConstructor = target.constructor;
     this.isStopped = false;
   }
@@ -421,7 +424,7 @@
     AfterReturning: AfterReturning,
     AfterThrowing: AfterThrowing,
     Around: Around
-  },
+  };
   jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
 })(window);

@@ -146,7 +146,7 @@ module("jsAspect.before");
 
     jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function(context) {
-        calledMethodNames.push(context.methodName);
+        calledMethodNames.push(context.method.name);
       }
     );
 
