@@ -26,13 +26,23 @@ module.exports = function (grunt)
     },
     qunit: {
       all: ["test/*.html"]
+    },
+    uglify: {
+      options: {
+        mangle: false
+      },
+      lib: {
+        files: {
+          'dest/aspect.min.js': ['src/aspect.js']
+        }
+      }
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
+  grunt.loadNpmTasks('grunt-contrib-qunit');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
 
   grunt.registerTask('test', ['qunit']);
-  grunt.registerTask('default', ['jshint', 'test']);
+  grunt.registerTask('default', ['jshint', 'test', 'uglify:lib']);
 };
