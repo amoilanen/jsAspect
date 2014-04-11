@@ -3,7 +3,7 @@ jsAspect
 
 Aspect-oriented framework for JavaScript
 
-[toc]
+
 
 ## Terminology
 
@@ -13,18 +13,22 @@ Aspect-oriented framework for JavaScript
 - `Intercept`: The technical overwritting of the method to attach the join points.
 
 ## API 
+`jsAspect.JOIN_POINT`: Contains all available join points.
 
-Existing ***join points*** yet:
+>Existing ***join points*** yet:
 - `before`: Will be executed before the adviced method
 - `afterThrowing`: Will be executed after the adviced method thrown an error.
 - `afterReturning`: Will be executed after the adviced method returned a value
 - `after`: Will be executed after the adviced method
 - `around`: Will be executed instead of the adviced method, passed the function and the arguments to execute the function by yourself.
 
-Existing ***pointcuts*** yet: 
+`jsAspect.POINTCUT`: Contains all available pointcuts.
+
+>Existing ***pointcuts*** yet: 
 - `prototype_methods`: *Default* Intercepts all prototype methods (even inherited)
 - `methods`: To advice object methods, instead of prototype methods
 - `prototype_own_methods`: Like `prototype_methods` without inherited methods.
+
 
 ## Usage 
 ### Define Advice
