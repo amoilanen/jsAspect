@@ -2,31 +2,42 @@
   "name": "jsAspect",
   "version": "0.5.0",
   "description": "Aspect-oriented framework for JavaScript",
-  "directories": {
-    "lib":"lib",
-    "src":"src",
-    "test": "test"
-  },
+  "files": [
+    "src",
+    "CONTRIBUTORS",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/antivanov/jsAspect.git"
   },
   "keywords": [
+    "aspect",
+    "advice",
+    "pointcut",
+    "join-point",
     "aspect-oriented",
+    "aspect-oriented-programming",
+    "aop",
     "javascript"
   ],
-  "author": "Anton Ivanov",
+  "author": {
+    "name": "Anton Ivanov",
+    "email": "anton.al.ivanov@gmail.com",
+    "url": "https://github.com/antivanov"
+  },
   "contributors": [
     {
       "name": "Konstantin Krassmann",
-      "email": "kkonstantin@gmx.de"
+      "email": "kkonstantin@gmx.de",
+      "url": "https://github.com/konstantinkrassmann"
     }
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/antivanov/jsAspect/issues"
   },
-  "dependencies": {
+  "devDependencies": {
     "bower":"*",
     "grunt":"*",
     "grunt-contrib-uglify":"*",
