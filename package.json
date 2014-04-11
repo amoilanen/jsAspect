@@ -28,6 +28,8 @@
   },
   "dependencies": {
     "bower":"*",
-    "grunt":"*"
+    "grunt":"*",
+    "grunt-contrib-uglify":"*",
+    "grunt-contrib-qunit":"*"
   }
 }
