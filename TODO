@@ -1,10 +1,11 @@
 //TODO: Use Grunt to build the library
 
+//TODO: Add the ability to configure pointcut on the aspect level, so that the setting
+for Aspect will override that of an Advice
+
 //TODO: Add error handling
 //TODO: Add an example of an aspect itself having an aspect injected to the tests
 
 //TODO: Add a couple of demos of using the library:
 //-logging
 //-caching
-
-//TODO: Add documentation to the implemented methods
