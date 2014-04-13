@@ -52,7 +52,7 @@ module("jsAspect.Aspect", {
       new jsAspect.Advice.Before(function(context) {
         self.called.push({
           method: context.method.name,
-          constructor: context.target.constructor.name, 
+          constructor: context.target.constructor.name,
           joinPoint: "before"
         });
       }),

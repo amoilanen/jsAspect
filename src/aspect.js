@@ -272,6 +272,10 @@
       "arguments": args
     };
     this.isStopped = false;
+    //Fixing the name property if it is not supported, and leaving it like that in the function
+    if (this.target.constructor.name === undefined) {
+      this.target.constructor.name = functionName(this.target.constructor);
+    }
   }
 
 
@@ -406,6 +410,10 @@
 
   function isFunction(obj) {
     return obj && Object.prototype.toString.call(obj) === '[object Function]';
+  }
+
+  function functionName(func) {
+    return func.toString().match(/function\s+([^(?:\()]*)/)[1];
   }
 
   function toArray(args) {
