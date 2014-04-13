@@ -413,7 +413,8 @@
   }
 
   function functionName(func) {
-    return func.toString().match(/function\s+([^(?:\()]*)/)[1];
+    var match = func.toString().match(/function\s+([^(?:\()\s]*)/);
+    return match ? match[1] : "";
   }
 
   function toArray(args) {
