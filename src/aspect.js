@@ -182,17 +182,7 @@
    * @method applyBeforeAdvices
    */
   function applyBeforeAdvices(context, method, args, executionContext) {
-    var beforeAdvices = method[jsAspect.JOIN_POINT.BEFORE];
-
-    beforeAdvices.forEach(function (advice) {
-      var adviceArguments = args.slice();
-
-      adviceArguments.unshift(executionContext);
-
-      if (!executionContext.isStopped) {
-        advice.apply(context, adviceArguments);
-      }
-    });
+    applyIndependentAdvices(method[jsAspect.JOIN_POINT.BEFORE], context, method, args, executionContext);
   }
 
   /**
@@ -239,17 +229,7 @@
    * @method applyAfterAdvices
    */
   function applyAfterAdvices(context, method, args, executionContext) {
-    var afterAdvices = method[jsAspect.JOIN_POINT.AFTER];
-
-    afterAdvices.forEach(function (advice) {
-      var adviceArguments = args.slice();
-
-      adviceArguments.unshift(executionContext);
-
-      if (!executionContext.isStopped) {
-        advice.apply(context, adviceArguments);
-      }
-    });
+    applyIndependentAdvices(method[jsAspect.JOIN_POINT.AFTER], context, method, args, executionContext);
   }
 
   /**
@@ -265,6 +245,27 @@
     return afterReturningAdvices.reduce(function (acc, current) {
       return current(acc);
     }, returnValue);
+  }
+
+  /**
+   * Applies advices which do not depend on results of each other if 'stop' was not called.
+   * @param advices
+   * @param context
+   * @param method
+   * @param args
+   * @param {ExecutionContext} executionContext
+   * @method applyAfterAdvices
+   */
+  function applyIndependentAdvices(advices, context, method, args, executionContext) {
+    advices.forEach(function (advice) {
+      var adviceArguments = args.slice();
+
+      adviceArguments.unshift(executionContext);
+
+      if (!executionContext.isStopped) {
+        advice.apply(context, adviceArguments);
+      }
+    });
   }
 
   /**
