@@ -3,7 +3,14 @@ jsAspect
 
 Aspect-oriented framework for JavaScript
 
+## Installation
+To install the library just use bower:
 
+``` javascript
+bower install jsaspect
+```
+
+Or download the minified file in the _dest_ folder.
 
 ## Terminology
 
