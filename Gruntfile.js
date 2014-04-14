@@ -33,7 +33,7 @@ module.exports = function (grunt)
       },
       lib: {
         files: {
-          'dest/aspect.min.js': ['src/aspect.js']
+          'dist/aspect.min.js': ['src/aspect.js']
         }
       }
     }

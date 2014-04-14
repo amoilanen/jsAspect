@@ -163,7 +163,8 @@
         applyAfterThrowingAdvices(self, method, exception);
         throw exception;
       }
-      applyAfterAdvices(self, method, args);
+      applyAfterAdvices(self, method, args, executionContext);
+      if (executionContext.isStopped) return;
       return applyAfterReturningAdvices(self, method, returnValue);
     };
     for(var join_point in jsAspect.JOIN_POINT){
@@ -234,13 +235,20 @@
    * @param context
    * @param method
    * @param args
+   * @param {ExecutionContext} executionContext
    * @method applyAfterAdvices
    */
-  function applyAfterAdvices(context, method, args) {
+  function applyAfterAdvices(context, method, args, executionContext) {
     var afterAdvices = method[jsAspect.JOIN_POINT.AFTER];
 
     afterAdvices.forEach(function (advice) {
-      advice.apply(context, args);
+      var adviceArguments = args.slice();
+
+      adviceArguments.unshift(executionContext);
+
+      if (!executionContext.isStopped) {
+        advice.apply(context, adviceArguments);
+      }
     });
   }
 
@@ -261,8 +269,9 @@
 
   /**
    * Type of the parameter, that is passed to the joinPoints. It contains information about the method and constructor itself.
-   * @param target
-   * @param methodName
+   * @param target - object for a method of which the advice is being executed
+   * @param methodName - name of the method being executed
+   * @param args - arguments with which the method is being executed
    * @constructor
    */
   function ExecutionContext(target, methodName, args) {
