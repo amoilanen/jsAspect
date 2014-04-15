@@ -14,7 +14,7 @@ module("jsAspect.afterThrowing");
         };
         
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
-            function afterThrowingCallback(exception) {
+            function afterThrowingCallback(context, exception) {
                 this.thrownExceptions = this.thrownExceptions || [];
                 this.thrownExceptions.push(exception.message);
             }
@@ -48,12 +48,12 @@ module("jsAspect.afterThrowing");
         };
         
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
-            function afterThrowingCallback(exception) {
+            function afterThrowingCallback(context, exception) {
                 exception.message = exception.message + "_aspect1"
             }
         );
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
-            function afterThrowingCallback(exception) {
+            function afterThrowingCallback(context, exception) {
                 exception.message = exception.message + "_aspect2"
             }
         );
@@ -81,7 +81,7 @@ module("jsAspect.afterThrowing");
         };
         
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
-            function afterThrowingCallback(exception) {
+            function afterThrowingCallback(context, exception) {
                 throw new Error("callbackexception");
             }
         );
@@ -95,4 +95,37 @@ module("jsAspect.afterThrowing");
             equal(e.message, "callbackexception", "Exception from advice");
         }
     });
+
+  test("jsAspect.inject: 'afterThrowing' advice has context", function ()
+  {
+    function Object()
+    {
+    }
+
+    Object.prototype.method = function ()
+    {
+      throw new Error("method1exception");
+    };
+
+    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+      function afterThrowingCallback(context, exception)
+      {
+        equal(context.method.name, "method", "method name is passed to 'context' properly");
+        deepEqual(context.method.arguments, [], "method arguments are passed to 'context' properly");
+        throw new Error("callbackexception");
+      }
+    );
+
+    var obj = new Object();
+
+    try
+    {
+      obj.method();
+      ok(false, "Exception should have been thrown at this point");
+    }
+    catch (e)
+    {
+      equal(e.message, "callbackexception", "Exception from advice");
+    }
+  });
 })();

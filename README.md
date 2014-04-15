@@ -154,7 +154,7 @@ target.method1();
 //logs: `joinPoint before`
 ``` 
 ### The `context` parameter
-The `context` parameter is currently passed to the `before` advices (in the next versions it will be passed to the other types of advices). It provides information about the adviced method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
+The `context` parameter is passed to all advices. It provides information about the adviced method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
 
 Usage:
 

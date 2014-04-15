@@ -158,14 +158,14 @@
       applyBeforeAdvices(self, method, args, executionContext);
       if (executionContext.isStopped) return;
       try {
-        returnValue = applyAroundAdvices(self, method, args);
+        returnValue = applyAroundAdvices(self, method, args, executionContext);
       } catch (exception) {
-        applyAfterThrowingAdvices(self, method, exception);
+        applyAfterThrowingAdvices(self, method, exception, executionContext);
         throw exception;
       }
       applyAfterAdvices(self, method, args, executionContext);
       if (executionContext.isStopped) return;
-      return applyAfterReturningAdvices(self, method, returnValue);
+      return applyAfterReturningAdvices(self, method, returnValue, executionContext);
     };
     for(var join_point in jsAspect.JOIN_POINT){
       target[methodName][jsAspect.JOIN_POINT[join_point]] = [];
@@ -190,11 +190,12 @@
    * @param context
    * @param method
    * @param args
+   * @param {ExecutionContext} executionContext
    * @method applyAroundAdvices
    * @private
    * @returns {Function|Object}
    */
-  function applyAroundAdvices(context, method, args) {
+  function applyAroundAdvices(context, method, args, executionContext) {
     var aroundAdvices = method[jsAspect.JOIN_POINT.AROUND]
         .slice(0, method[jsAspect.JOIN_POINT.AROUND].length),
       firstAroundAdvice = aroundAdvices.shift(),
@@ -209,14 +210,15 @@
    * @param context
    * @param method
    * @param exception
+   * @param executionContext
    * @method applyAfterThrowingAdvices
    * @private
    */
-  function applyAfterThrowingAdvices(context, method, exception) {
+  function applyAfterThrowingAdvices(context, method, exception, executionContext) {
     var afterThrowingAdvices = method[jsAspect.JOIN_POINT.AFTER_THROWING];
 
     afterThrowingAdvices.forEach(function (advice) {
-      advice.call(context, exception);
+      advice.call(context, executionContext, exception);
     });
   }
 
@@ -234,16 +236,16 @@
 
   /**
    * Adds the join point to add behaviour <i>after</i> the method returned a value or the method stopped working (no return value).
+   * @param context
    * @param method
    * @param returnValue
    * @method applyAfterReturningAdvices
    * @returns {Object}
    */
-  function applyAfterReturningAdvices(context, method, returnValue) {
+  function applyAfterReturningAdvices(context, method, returnValue, executionContext) {
     var afterReturningAdvices = method[jsAspect.JOIN_POINT.AFTER_RETURNING];
-
     return afterReturningAdvices.reduce(function (acc, current) {
-      return current(acc);
+      return current(executionContext,acc);
     }, returnValue);
   }
 
