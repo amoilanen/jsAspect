@@ -10,7 +10,7 @@ To install the library just use bower:
 bower install jsaspect
 ```
 
-Or download the minified file in the _dest_ folder.
+Or download the minified file in the _dist_ folder.
 
 ## Terminology
 
