@@ -215,11 +215,7 @@
    * @private
    */
   function applyAfterThrowingAdvices(context, method, exception, executionContext) {
-    var afterThrowingAdvices = method[jsAspect.JOIN_POINT.AFTER_THROWING];
-
-    afterThrowingAdvices.forEach(function (advice) {
-      advice.call(context, executionContext, exception);
-    });
+    applyIndependentAdvices(method[jsAspect.JOIN_POINT.AFTER_THROWING], context, method, [exception], executionContext);
   }
 
   /**

@@ -3,6 +3,8 @@ module("jsAspect.afterThrowing");
 (function() {
 
   test("jsAspect.inject: 'afterThrowing' advice, 'prototypeMethods' pointcut", function() {
+    var recordedValues = [];
+
     function Target() {
     }
 
@@ -13,6 +15,17 @@ module("jsAspect.afterThrowing");
     Target.prototype.method2 = function() {
       throw new Error("method2exception");
     };
+
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+      function(context) {
+        recordedValues.push("after");
+      }
+    );
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      function(context) {
+        recordedValues.push("afterReturning");
+      }
+    );
 
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
@@ -32,6 +45,7 @@ module("jsAspect.afterThrowing");
       }
     });
 
+    deepEqual(recordedValues, [], "'after' and 'afterReturning' advices are not applied after exception is thrown");
     deepEqual(thrownExceptions, ["method1exception", "method2exception"], "Exceptions are thrown from the methods");
     deepEqual(obj.thrownExceptions, ["method1exception", "method2exception"], "Aspects recieve the exceptions");
   });
@@ -125,6 +139,44 @@ module("jsAspect.afterThrowing");
     } catch (e) {
       equal(e.message, "method1exception", "Exception caught");
       deepEqual(exceptionMessagesInAdvice, ["method1exception"], "Advice is applied");
+    }
+  });
+
+  test("jsAspect.inject: 'context.stop' prevents following 'afterThrowing' advices from execution", function() {
+    function Target() {
+    }
+
+    Target.prototype.method = function() {
+      throw new Error("method1exception");
+    };
+
+    var recordedValues = [];
+
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+      function(context, exception) {
+        recordedValues.push("advice1");
+      }
+    );
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+      function(context, exception) {
+        recordedValues.push("advice2");
+      }
+    );
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+      function(context, exception) {
+        recordedValues.push("advice3");
+        context.stop();
+      }
+    );
+
+    var obj = new Target();
+
+    try {
+      obj.method();
+      ok(false, "Exception should have been thrown at this point");
+    } catch (e) {
+      equal(e.message, "method1exception", "Exception caught");
+      deepEqual(recordedValues, ["advice3"], "Only one advice is applied");
     }
   });
 })();
