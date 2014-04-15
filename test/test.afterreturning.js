@@ -10,7 +10,7 @@ module("jsAspect.afterReturning");
         };
         
         jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
-            function afterReturningCallback(retValue) {
+            function afterReturningCallback(context, retValue) {
                 retValue.value = retValue.value + 1;
                 return retValue;
             }
@@ -31,12 +31,36 @@ module("jsAspect.afterReturning");
         
         ["aspect1", "aspect2", "aspect3"].forEach(function (aspectName) {
             jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
-                function afterReturningCallback(retValue) {
+                function afterReturningCallback(context, retValue) {
                     return retValue + "_" + aspectName;
                 }
             );
         });
         
         equal(new Object().identity("value"), "value_aspect3_aspect2_aspect1", "'afterReturning' several aspects applied in the reverse order");
-    });    
+    });
+    test("jsAspect.inject: 'afterReturning' has context", function ()
+    {
+      function Object()
+      {
+      }
+
+      Object.prototype.identity = function (value)
+      {
+        return value;
+      };
+
+        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+          function afterReturningCallback(context, retValue)
+          {
+            equal(context.method.name, "identity", "method name is passed to 'context' properly");
+            deepEqual(context.method.arguments, ["test"], "method arguments are passed to 'context' properly");
+            deepEqual(retValue, "test", "return value still passed.");
+          }
+        );
+
+      var obj1 = new Object();
+      obj1.identity("test");
+
+    });
 })();
