@@ -1,3 +1,5 @@
+//TODO: Implement passing 'context' to 'around' advices
+
 //TODO: Add a separate file that will export a Node module and require the library itself like in https://github.com/antivanov/grunt-prepr/blob/master/tasks/prepr-grunt.js
 
 //TODO: Add procedural style like methods jsAspect.before(...), jsAspect.afterReturning(...) etc.

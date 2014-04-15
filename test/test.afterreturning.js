@@ -60,4 +60,40 @@ module("jsAspect.afterReturning");
     var obj = new Target();
     obj.square(3);
   });
+
+  test("jsAspect.inject: 'stop' can be called in 'afterReturning', the rest of 'afterReturning' advices are not executed", function() {
+    var recordedValues = [];
+
+    function Target() {
+    }
+
+    Target.prototype.method = function() {
+      return "value";
+    };
+
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      function(context, retValue) {
+        recordedValues.push("advice1_" + retValue);
+        return retValue;
+      }
+    );
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      function(context, retValue) {
+        recordedValues.push("advice2_" + retValue);
+        return retValue;
+      }
+    );
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      function(context, retValue) {
+        context.stop();
+        recordedValues.push("advice3_" + retValue);
+        return retValue;
+      }
+    );
+
+    var obj = new Target();
+
+    equal(obj.method(), (void 0), "'undefined' is returned if execution is stopped");
+    deepEqual(recordedValues, ["advice3_value"], "only one advice is called");
+  });
 })();

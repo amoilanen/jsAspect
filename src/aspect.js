@@ -244,8 +244,9 @@
    */
   function applyAfterReturningAdvices(context, method, returnValue, executionContext) {
     var afterReturningAdvices = method[jsAspect.JOIN_POINT.AFTER_RETURNING];
-    return afterReturningAdvices.reduce(function (acc, current) {
-      return current(executionContext,acc);
+
+    return afterReturningAdvices.reduce(function(acc, current) {
+      return !executionContext.isStopped ? current(executionContext, acc) : (void 0);
     }, returnValue);
   }
 
