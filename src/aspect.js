@@ -35,7 +35,8 @@
         "AROUND": "__around"
       }
     },
-    adviceEnhancedFlagName = "__jsAspect_advice_enhanced";
+    adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
+    originalMethodFlagName = "__jsAspect_original_method";
 
   var DEFAULT_POINTCUT = jsAspect.POINTCUT.PROTOTYPE_METHODS;
 
@@ -117,19 +118,23 @@
    */
   function wrapAroundAdvice(advice) {
 
-    var wrappedAdvice = function(leftAroundAdvices) {
+    var wrappedAdvice = function(executionContext, leftAroundAdvices) {
       var oThis = this,
         nextWrappedAdvice = leftAroundAdvices.shift(),
-        args = toArray(arguments).slice(1);
+        args = toArray(arguments).slice(2);
 
       if (nextWrappedAdvice) {
         var nextUnwrappedAdvice = function() {
           var argsForWrapped = toArray(arguments);
 
           argsForWrapped.unshift(leftAroundAdvices);
+          argsForWrapped.unshift(executionContext);
           return nextWrappedAdvice.apply(oThis, argsForWrapped);
         };
         args.unshift(nextUnwrappedAdvice);
+      }
+      if (!advice.originalMethodFlagName) {
+        args.unshift(executionContext);
       }
       return advice.apply(this, args);
     };
@@ -148,6 +153,7 @@
   function enhanceWithAdvices(target, methodName) {
     var originalMethod = target[methodName];
 
+    originalMethod.originalMethodFlagName = true;
     target[methodName] = function() {
       var self = this,
         method = target[methodName],
@@ -201,6 +207,7 @@
       argsForAroundAdvicesChain = args.slice();
 
     argsForAroundAdvicesChain.unshift(aroundAdvices);
+    argsForAroundAdvicesChain.unshift(executionContext);
     return firstAroundAdvice.apply(context, argsForAroundAdvicesChain);
   }
 

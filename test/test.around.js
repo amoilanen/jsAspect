@@ -15,7 +15,7 @@ module("jsAspect.around");
     };
 
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func, x) {
+      function aroundCallback(context, func, x) {
         return 2 * func(x);
       }
     );
@@ -39,8 +39,8 @@ module("jsAspect.around");
     };
 
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func) {
-        var args = [].slice.call(arguments, 1),
+      function aroundCallback(context, func) {
+        var args = [].slice.call(arguments, 2),
           sum = func.apply(this, args);
 
         return (sum > 10) ? sum : 0;
@@ -70,19 +70,19 @@ module("jsAspect.around");
     };
 
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func, x) {
+      function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 1");
         return 2 * func(x);
       }
     );
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func, x) {
+      function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 2");
         return 3 * func(x);
       }
     );
     jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func, x) {
+      function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 3");
         return 4 * func(x);
       }
@@ -107,7 +107,7 @@ module("jsAspect.around");
     };
 
     jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.AROUND,
-      function aroundCallback(func, x) {
+      function aroundCallback(context, func, x) {
         return func(x) - 1;
       }
     );
@@ -116,9 +116,7 @@ module("jsAspect.around");
     equal(obj.multiplyByTwo(3), 5, "'around' advice has been applied to 'multiplyByTwo'");
   });
 
-  _test = function() {};
-
-  _test("jsAspect.inject: 'around' has context", function() {
+  test("jsAspect.inject: 'around' has context", function() {
     var args = [1, 2, 3];
     var retValue = args.reduce(function(acc, cur) {
       return acc + cur;
@@ -135,7 +133,7 @@ module("jsAspect.around");
       function(context, method, x, y, z) {
         equal(context.method.name, "sum", "method name is passed to 'context' properly");
         deepEqual(context.method.arguments, args, "method arguments are passed to 'context' properly");
-        equal(method, Target.prototype.sum, "invoked method is passed correctly");
+        equal(method(1, 2, 3), 6, "invoked method is passed correctly");
         deepEqual([x, y, z], args, "arguments are passed correctly");
         return retValue;
       }
@@ -144,4 +142,6 @@ module("jsAspect.around");
     var obj = new Target();
     equal(obj.sum.apply(obj, args), retValue, "Advice is applied");
   });
+
+  //TODO: 'around' advice has an 'around' advice applied to it itself, the context should be passed properly still
 })();
