@@ -115,4 +115,33 @@ module("jsAspect.around");
     equal(obj.identity(5), 5, "'around' advice has not been applied to 'identity'");
     equal(obj.multiplyByTwo(3), 5, "'around' advice has been applied to 'multiplyByTwo'");
   });
+
+  _test = function() {};
+
+  _test("jsAspect.inject: 'around' has context", function() {
+    var args = [1, 2, 3];
+    var retValue = args.reduce(function(acc, cur) {
+      return acc + cur;
+    }, 0) + 1;
+
+    function Target() {
+    }
+
+    Target.prototype.sum = function(x, y, z) {
+      return x + y + z;
+    };
+
+    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      function(context, method, x, y, z) {
+        equal(context.method.name, "sum", "method name is passed to 'context' properly");
+        deepEqual(context.method.arguments, args, "method arguments are passed to 'context' properly");
+        equal(method, Target.prototype.sum, "invoked method is passed correctly");
+        deepEqual([x, y, z], args, "arguments are passed correctly");
+        return retValue;
+      }
+    );
+
+    var obj = new Target();
+    equal(obj.sum.apply(obj, args), retValue, "Advice is applied");
+  });
 })();
