@@ -196,8 +196,7 @@
    * @returns {Function|Object}
    */
   function applyAroundAdvices(context, method, args, executionContext) {
-    var aroundAdvices = method[jsAspect.JOIN_POINT.AROUND]
-        .slice(0, method[jsAspect.JOIN_POINT.AROUND].length),
+    var aroundAdvices = toArray(method[jsAspect.JOIN_POINT.AROUND]),
       firstAroundAdvice = aroundAdvices.shift(),
       argsForAroundAdvicesChain = args.slice();
 
