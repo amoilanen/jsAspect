@@ -162,11 +162,10 @@
       var self = this,
         method = target[methodName],
         args = toArray(arguments),
-        returnValue;
-      var  executionContext = new ExecutionContext(target, methodName, args);
+        returnValue,
+        executionContext = new ExecutionContext(target, methodName, args);
 
       applyBeforeAdvices(self, method, args, executionContext);
-      if (executionContext.isStopped) return;
       try {
         returnValue = applyAroundAdvices(self, method, args, executionContext);
       } catch (exception) {
@@ -174,7 +173,6 @@
         throw exception;
       }
       applyAfterAdvices(self, method, args, executionContext);
-      if (executionContext.isStopped) return;
       return applyAfterReturningAdvices(self, method, returnValue, executionContext);
     };
     for(var join_point in jsAspect.JOIN_POINT){
