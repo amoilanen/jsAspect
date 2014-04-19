@@ -123,6 +123,10 @@
         nextWrappedAdvice = leftAroundAdvices.shift(),
         args = toArray(arguments).slice(2);
 
+      if (executionContext.isStopped) {
+        return;
+      }
+
       if (nextWrappedAdvice) {
         var nextUnwrappedAdvice = function() {
           var argsForWrapped = toArray(arguments);

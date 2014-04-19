@@ -92,7 +92,7 @@ module("jsAspect.around");
     equal(obj.minusOne(3), 48, "'around' advice has been applied to 'minusOne'");
   });
 
-  test("jsAspect.inject: 'around' advice, 'self' pointcut", function() {
+  test("jsAspect.inject: 'around' advice, 'methods' pointcut", function() {
     function Target() {
     }
 
@@ -141,6 +141,58 @@ module("jsAspect.around");
 
     var obj = new Target();
     equal(obj.sum.apply(obj, args), retValue, "Advice is applied");
+  });
+
+  test("jsAspect.inject: 'around' advice, 'context.stop' prevents rest of 'around' advices from execution, as well as 'after' and 'afterReturning' advices", function() {
+    var recordedValues = [];
+
+    var obj = new Target();
+
+    function Target() {
+    }
+
+    Target.prototype.identity = function(x) {
+      return x;
+    };
+
+    jsAspect.inject(Target,
+      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+      function(context, x) {
+        recordedValues.push("after");
+      }
+    );
+    jsAspect.inject(Target,
+      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      function(context, retValue) {
+        recordedValues.push("afterReturning");
+      }
+    );
+    jsAspect.inject(Target,
+      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      function(context, func, x) {
+        recordedValues.push("around1");
+        return 2 * func(x);
+      }
+    );
+    jsAspect.inject(Target,
+      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      function(context, func, x) {
+        recordedValues.push("around2");
+        return 3 * func(x);
+      }
+    );
+    jsAspect.inject(Target,
+      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      function(context, func, x) {
+        recordedValues.push("around3");
+        context.stop();
+        equal(func(x), undefined);
+        return 4 * func(x);
+      }
+    );
+
+    equal(obj.identity(3), undefined, "after stopping returned value is 'undefined'");
+    deepEqual(recordedValues, ["around3"], "only one around advice has been applied");
   });
 
   //TODO: 'around' advice has an 'around' advice applied to it itself, the context should be passed properly still
