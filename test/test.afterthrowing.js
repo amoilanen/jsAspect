@@ -179,4 +179,51 @@ module("jsAspect.afterThrowing");
       deepEqual(recordedValues, ["advice3"], "Only one advice is applied");
     }
   });
+
+  test("jsAspect.afterThrowing 'prototypeMethods' pointcut is used by default", function() {
+    var recordedValues = [];
+
+    function Target() {
+    }
+
+    Target.method1static = function() {
+      throw new Error("method1staticexception");
+    };
+
+    Target.prototype.method1 = function() {
+      throw new Error("method1exception");
+    };
+
+    Target.prototype.method2 = function() {
+      throw new Error("method2exception");
+    };
+
+    var obj = new Target();
+
+    jsAspect.afterThrowing(Target, function(context) {
+      recordedValues.push(context.method.name);
+    }).afterThrowing(Target, function(context) {
+      recordedValues.push(context.method.name);
+    }, jsAspect.POINTCUT.METHODS);
+
+    try {
+      obj.method1();
+      ok(false, "Exception should have been when calling method1");
+    } catch (e) {
+      equal(e.message, "method1exception", "Exception caught for method1");
+    }
+    try {
+      obj.method2();
+      ok(false, "Exception should have been when calling method2");
+    } catch (e) {
+      equal(e.message, "method2exception", "Exception caught for method2");
+    }
+    try {
+      Target.method1static();
+      ok(false, "Exception should have been when calling method1static");
+    } catch (e) {
+      equal(e.message, "method1staticexception", "Exception caught for method1static");
+    }
+    deepEqual(recordedValues, ["method1", "method2", "method1static"], "advices are applied");
+  });
 })();

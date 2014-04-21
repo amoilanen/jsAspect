@@ -195,5 +195,40 @@ module("jsAspect.around");
     deepEqual(recordedValues, ["around3"], "only one around advice has been applied");
   });
 
+  test("jsAspect.around: 'prototypeMethods' pointcut is used by default", function() {
+    var recordedValues = [];
+
+    function Target() {
+    }
+
+    Target.method1static = function() {
+      return "method1staticvalue";
+    };
+
+    Target.prototype.method1 = function() {
+      return "method1value";
+    };
+
+    Target.prototype.method2 = function() {
+      return "method2value";
+    };
+
+    var obj = new Target();
+
+    jsAspect.around(Target, function(context, func) {
+      recordedValues.push(context.method.name);
+      return func() + "_advised";
+    }).around(Target, function(context, func) {
+      recordedValues.push(context.method.name);
+      return func() + "_advised";
+    }, jsAspect.POINTCUT.METHODS);
+
+    equal(obj.method1(), "method1value_advised", "method1 returns correct value");
+    equal(obj.method2(), "method2value_advised", "method2 returns correct value");
+    equal(Target.method1static(), "method1staticvalue_advised", "method1static returns correct value");
+
+    deepEqual(recordedValues, ["method1", "method2", "method1static"], "advices are applied");
+  });
+
   //TODO: 'around' advice has an 'around' advice applied to it itself, the context should be passed properly still
 })();

@@ -96,4 +96,39 @@ module("jsAspect.afterReturning");
     equal(obj.method(), (void 0), "'undefined' is returned if execution is stopped");
     deepEqual(recordedValues, ["advice3_value"], "only one advice is called");
   });
+
+  test("jsAspect.afterReturning: 'prototypeMethods' pointcut is used by default", function() {
+    var recordedValues = [];
+
+    function Target() {
+    }
+
+    Target.method1static = function() {
+      return "method1staticvalue";
+    };
+
+    Target.prototype.method1 = function() {
+      return "method1value";
+    };
+
+    Target.prototype.method2 = function() {
+      return "method2value";
+    };
+
+    var obj = new Target();
+
+    jsAspect.afterReturning(Target, function(context, retValue) {
+      recordedValues.push(context.method.name);
+      return retValue;
+    }).afterReturning(Target, function(context, retValue) {
+      recordedValues.push(context.method.name);
+      return retValue;
+    }, jsAspect.POINTCUT.METHODS);
+
+    equal(obj.method1(), "method1value", "method1 returns correct value");
+    equal(obj.method2(), "method2value", "method2 returns correct value");
+    equal(Target.method1static(), "method1staticvalue", "method1static returns correct value");
+
+    deepEqual(recordedValues, ["method1", "method2", "method1static"], "advices are applied");
+  });
 })();

@@ -52,7 +52,7 @@
    * @param {jsAspect.POINTCUT} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
    * @param {Object} introduction The properties that want to be extended.
    * @method introduce
-   * @returns {Object} The target with extended properties.
+   * @returns {Object} jsAspect to allow chaining calls
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
     target = ((jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut) || (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut)) ? target.prototype : target;
@@ -63,7 +63,7 @@
       }
     }
 
-    return target;
+    return jsAspect;
   };
 
   /**
@@ -74,7 +74,7 @@
    * @param {Function} advice The code, that needs to be executed at the join point.
    * @param {String} [methodName] The name of the method that need to be advised.
    * @method inject
-   * @returns jsAspect to allow chaining calls
+   * @returns {Object} jsAspect to allow chaining calls
    */
   jsAspect.inject = function(target, pointcut, joinPoint, advice, methodName) {
     var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcut),

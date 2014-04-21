@@ -260,10 +260,10 @@ module("jsAspect.before");
       recordedValues.push(context.method.name);
     }, jsAspect.POINTCUT.METHODS);
 
-    equal(obj.method1(), "method1value", "method1 is called as before");
-    equal(obj.method2(), "method2value", "method2 is called as before");
-    equal(Target.method1static(), "method1staticvalue", "method1static is called as before");
+    equal(obj.method1(), "method1value", "method1 returns correct value");
+    equal(obj.method2(), "method2value", "method2 returns correct value");
+    equal(Target.method1static(), "method1staticvalue", "method1static returns correct value");
 
-    deepEqual(recordedValues, ["method1", "method2", "method1static"], "'after' advices are applied");
+    deepEqual(recordedValues, ["method1", "method2", "method1static"], "advices are applied");
   });
 })();
