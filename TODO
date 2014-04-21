@@ -1,11 +1,10 @@
-//TODO: Implement passing 'context' to 'around' advices
-
 //TODO: Add a separate file that will export a Node module and require the library itself like in https://github.com/antivanov/grunt-prepr/blob/master/tasks/prepr-grunt.js
 
 //TODO: Add procedural style like methods jsAspect.before(...), jsAspect.afterReturning(...) etc.
 
 //TODO: Add the ability to configure pointcut on the aspect level, so that the setting
 for Aspect will override that of an Advice
+
 //TODO: Run jshint on also the test files and correct the warnings
 //TODO: Properly format the source code for tests like already done for test.before.js
 

@@ -68,9 +68,9 @@
    * @param {Function} advice The code, that needs to be executed at the join point.
    * @param {String} [methodName] The name of the method that need to be advised.
    * @method inject
-   * @returns void
+   * @returns jsAspect to allow chaining calls
    */
-  jsAspect.inject = function (target, pointcut, joinPoint, advice, methodName) {
+  jsAspect.inject = function(target, pointcut, joinPoint, advice, methodName) {
     var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcut),
       isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut),
       isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut);
@@ -85,6 +85,25 @@
         }
       }
     }
+    return jsAspect;
+  };
+
+  /**
+   * Specify an 'after' advice.
+   * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
+   * @param {Function} advice The code, that needs to be executed at the join point.
+   * @param {jsAspect.POINTCUT} pointcut The pointcut to specify or quantify the join points,
+   * optional.
+   * @method after
+   * @returns jsAspect to allow chaining calls
+   */
+  jsAspect.after = function(target, advice, pointcut) {
+    jsAspect.inject(target,
+      pointcut || jsAspect.POINTCUT.PROTOTYPE_METHODS,
+      jsAspect.JOIN_POINT.AFTER,
+      advice
+    );
+    return jsAspect;
   };
 
   /**
