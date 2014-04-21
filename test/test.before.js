@@ -233,4 +233,37 @@ module("jsAspect.before");
     equal(acc.withDraw(500), true, "withDrawn 500 dollars");
     deepEqual(calledClassNames, ["Object", "Object", "Account"], "Constructor name is available in context");
   });
+
+  test("jsAspect.before: 'prototypeMethods' pointcut is used by default", function() {
+    var recordedValues = [];
+
+    function Target() {
+    }
+
+    Target.method1static = function() {
+      return "method1staticvalue";
+    };
+
+    Target.prototype.method1 = function() {
+      return "method1value";
+    };
+
+    Target.prototype.method2 = function() {
+      return "method2value";
+    };
+
+    var obj = new Target();
+
+    jsAspect.before(Target, function(context) {
+      recordedValues.push(context.method.name);
+    }).before(Target, function(context) {
+      recordedValues.push(context.method.name);
+    }, jsAspect.POINTCUT.METHODS);
+
+    equal(obj.method1(), "method1value", "method1 is called as before");
+    equal(obj.method2(), "method2value", "method2 is called as before");
+    equal(Target.method1static(), "method1staticvalue", "method1static is called as before");
+
+    deepEqual(recordedValues, ["method1", "method2", "method1static"], "'after' advices are applied");
+  });
 })();

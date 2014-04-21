@@ -40,6 +40,12 @@
 
   var DEFAULT_POINTCUT = jsAspect.POINTCUT.PROTOTYPE_METHODS;
 
+  function joinPointName(joinPointId) {
+    return joinPointId.toLowerCase().replace(/_[a-z]/, function(match) {
+      return match[1].toUpperCase();
+    });
+  }
+
   /**
    * Extends/Introduces additional properties like fields or function to a passed constructor or object.
    * @param {Function|Object} target The object or constructor that want to be extended
@@ -88,23 +94,16 @@
     return jsAspect;
   };
 
-  /**
-   * Specify an 'after' advice.
-   * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
-   * @param {Function} advice The code, that needs to be executed at the join point.
-   * @param {jsAspect.POINTCUT} pointcut The pointcut to specify or quantify the join points,
-   * optional.
-   * @method after
-   * @returns jsAspect to allow chaining calls
-   */
-  jsAspect.after = function(target, advice, pointcut) {
-    jsAspect.inject(target,
-      pointcut || jsAspect.POINTCUT.PROTOTYPE_METHODS,
-      jsAspect.JOIN_POINT.AFTER,
-      advice
-    );
-    return jsAspect;
-  };
+  keys(jsAspect.JOIN_POINT).forEach(function(joinPoint) {
+    jsAspect[joinPointName(joinPoint)] = function(target, advice, pointcut) {
+      jsAspect.inject(target,
+        pointcut || jsAspect.POINTCUT.PROTOTYPE_METHODS,
+        jsAspect.JOIN_POINT[joinPoint],
+        advice
+      );
+      return jsAspect;
+    };
+  });
 
   /**
    * Intercepts a single method with a join point and adds an advice.
@@ -455,6 +454,28 @@
 
   function toArray(args) {
     return [].slice.call(args, 0);
+  }
+
+  function properties(obj) {
+    var result = [];
+    for (var property in obj) {
+      if (obj.hasOwnProperty(property)) {
+        result.push([property, obj[property]]);
+      }
+    }
+    return result;
+  }
+
+  function keys(obj) {
+    return properties(obj).map(function(property) {
+      return property[0];
+    });
+  }
+
+  function values(obj) {
+    return properties(obj).map(function(property) {
+      return property[1];
+    });
   }
 
   jsAspect.Advice = {
