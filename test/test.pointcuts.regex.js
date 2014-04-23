@@ -35,6 +35,39 @@ module("jsAspect.POINTCUT regex");
     deepEqual(calledMethodNames, ["aabc", "abc"], "Advice was applied only for the methods that match a regex");
   });
 
+  test("jsAspect.Aspect shortcut methods for specifying only a regex", function() {
+    var obj = {
+      aabc: function() {
+        return "aabc";
+      },
+      bcd: function() {
+        return "bcd";
+      },
+      abc: function() {
+        return "abc";
+      },
+      bc: function() {
+        return "bc";
+      }
+    };
+    var calledMethodNames = [];
+
+    var aspect = new jsAspect.Aspect([
+      new jsAspect.Advice.Before(function(context) {
+        calledMethodNames.push(context.method.name);
+      })
+    ]);
+
+    aspect.withPointcut(jsAspect.POINTCUT.METHODS).withRegex("a+bc").applyTo(obj);
+
+    equal(obj.aabc(), "aabc", "method 'aabc' executed");
+    equal(obj.bcd(), "bcd", "method 'bcd' executed");
+    equal(obj.abc(), "abc", "method 'abc' executed");
+    equal(obj.bc(), "bc", "method 'bc' executed");
+
+    deepEqual(calledMethodNames, ["aabc", "abc"], "Advice was applied only for the methods that match a regex");
+  });
+
   test("jsAspect.Aspect if no regex is specified then all the methods will be matches by default", function() {
     var obj = {
       aabc: function() {

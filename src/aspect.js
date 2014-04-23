@@ -89,8 +89,10 @@
     } else {
       target = (isPrototypeOwnMethodsPointcut || isPrototypeMethodsPointcut) ? target.prototype : target;
       for (var method in target) {
-        if ((target.hasOwnProperty(method) || isPrototypeMethodsPointcut)
-             && ((methodRegex === (void 0)) || method.match(methodRegex))) {
+        var shouldInjectToMethod = (target.hasOwnProperty(method) || isPrototypeMethodsPointcut);
+        var matchesMethodRegex = (methodRegex === (void 0)) || method.match(methodRegex);
+
+        if (shouldInjectToMethod && matchesMethodRegex) {
           injectAdvice(target, method, advice, joinPoint);
         }
       }
@@ -447,6 +449,15 @@
   Aspect.prototype.withPointcut = function(pointcutName, methodRegex) {
     this.pointcut = new Pointcut(pointcutName, new RegExp(methodRegex));
     return this;
+  };
+
+  /*
+   * Specifies the regex for the specified pointcut.
+   * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
+   * @method withRegex
+   */
+  Aspect.prototype.withRegex = function(methodRegex) {
+    return this.withPointcut(this.pointcut.pointcutName, methodRegex);
   };
 
   /**
