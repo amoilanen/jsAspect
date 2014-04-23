@@ -77,16 +77,20 @@
    * @returns {Object} jsAspect to allow chaining calls
    */
   jsAspect.inject = function(target, pointcut, joinPoint, advice, methodName) {
-    var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcut),
-      isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut),
-      isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut);
+    var pointcutName = pointcut.pointcutName || pointcut;
+    var methodRegex = pointcut.methodRegex;
+
+    var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcutName);
+    var isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcutName);
+    var isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcutName);
 
     if (isMethodPointcut) {
       injectAdvice(target, methodName, advice, joinPoint);
     } else {
       target = (isPrototypeOwnMethodsPointcut || isPrototypeMethodsPointcut) ? target.prototype : target;
       for (var method in target) {
-        if (target.hasOwnProperty(method) || isPrototypeMethodsPointcut) {
+        if ((target.hasOwnProperty(method) || isPrototypeMethodsPointcut)
+             && ((methodRegex === (void 0)) || method.match(methodRegex))) {
           injectAdvice(target, method, advice, joinPoint);
         }
       }
@@ -441,7 +445,7 @@
    * @method withPointcut
    */
   Aspect.prototype.withPointcut = function(pointcutName, methodRegex) {
-    this.pointcut = new Pointcut(pointcutName, methodRegex);
+    this.pointcut = new Pointcut(pointcutName, new RegExp(methodRegex));
     return this;
   };
 
@@ -457,7 +461,7 @@
 
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
-        jsAspect.inject(target, self.pointcut.pointcutName, advice.joinPoint, advice.func);
+        jsAspect.inject(target, self.pointcut, advice.joinPoint, advice.func);
       });
     });
   };
