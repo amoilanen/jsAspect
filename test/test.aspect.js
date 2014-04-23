@@ -152,11 +152,11 @@ module("jsAspect.Aspect", {
     var aspect = new jsAspect.Aspect([
       new jsAspect.Advice.Before(function() {
         self.called.push(this);
-      }, jsAspect.POINTCUT.METHODS)
+      })
     ]);
 
-    //Same as aspect.applyTo.apply(aspect, objects);
-    aspect.applyTo(objects[0], objects[1], objects[2]);
+    //Same as aspect.pointcut(jsAspect.POINTCUT.METHODS).applyTo.apply(aspect, objects);
+    aspect.withPointcut(jsAspect.POINTCUT.METHODS).applyTo(objects[0], objects[1], objects[2]);
 
     objects.forEach(function(obj, idx) {
       equal(obj.method(), "methodvalue", "object " + idx + " method successful");
@@ -177,16 +177,16 @@ module("jsAspect.Aspect", {
     var aspect = new jsAspect.Aspect(
       new jsAspect.Advice.Before(function() {
         self.called.push("advice1");
-      }, jsAspect.POINTCUT.METHODS),
+      }),
       new jsAspect.Advice.Before(function() {
         self.called.push("advice2");
-      }, jsAspect.POINTCUT.METHODS),
+      }),
       new jsAspect.Advice.Before(function() {
         self.called.push("advice3");
-      }, jsAspect.POINTCUT.METHODS)
+      })
     );
 
-    aspect.applyTo(obj);
+    aspect.withPointcut(jsAspect.POINTCUT.METHODS).applyTo(obj);
 
     equal(obj.method("test"), "methodvalue", "method is called successfully");
 
@@ -253,10 +253,9 @@ module("jsAspect.Aspect", {
      */
     this.called = [];
 
-    new jsAspect.Aspect(
-      new jsAspect.Advice.Before(beforeAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS),
-      new jsAspect.Advice.After(afterAdvice, jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
-    ).applyTo(AnotherChild);
+    new jsAspect.Aspect(new jsAspect.Advice.Before(beforeAdvice), new jsAspect.Advice.After(afterAdvice))
+      .withPointcut(jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
+      .applyTo(AnotherChild);
 
     var anotherChild = new AnotherChild();
 

@@ -38,7 +38,7 @@
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
     originalMethodFlagName = "__jsAspect_original_method";
 
-  var DEFAULT_POINTCUT = jsAspect.POINTCUT.PROTOTYPE_METHODS;
+  var DEFAULT_POINTCUT = new Pointcut(jsAspect.POINTCUT.PROTOTYPE_METHODS);
 
   function joinPointName(joinPointId) {
     return joinPointId.toLowerCase().replace(/_[a-z]/, function(match) {
@@ -331,17 +331,12 @@
 
   /**
    * Generic advice class.
-   * @param {POINTCUT} [pointcut]
    * @param {JOIN_POINT} joinPoint
    * @param {function(Object, ...)} func
    * @class Advice
    * @constructor
    */
-  function Advice(pointcut, joinPoint, func) {
-    if (pointcut === (void 0)) {
-        pointcut = DEFAULT_POINTCUT;
-    }
-    this.pointcut = pointcut;
+  function Advice(joinPoint, func) {
     this.joinPoint = joinPoint;
     this.func = func;
   }
@@ -349,71 +344,79 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
    * @param {function(Object, ...)} func
-   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class Before
    * @extends Advice
    *
    * @constructor
    */
-  function Before(func, pointcut) {
-     Advice.call(this, pointcut, jsAspect.JOIN_POINT.BEFORE, func);
+  function Before(func) {
+     Advice.call(this, jsAspect.JOIN_POINT.BEFORE, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
    * @param {function(Object, ...)} func
-   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class After
    * @extends Advice
    *
    * @constructor
    */
-  function After(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER, func);
+  function After(func) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
    * @param {function(Object, ...)} func
-   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class AfterReturning
    * @extends Advice
    *
    * @constructor
    */
-  function AfterReturning(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER_RETURNING, func);
+  function AfterReturning(func) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER_RETURNING, func);
   }
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
    * @param {function(Object, ...)} func
-   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class AfterThrowing
    * @extends Advice
    *
    * @constructor
    */
-  function AfterThrowing(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AFTER_THROWING, func);
+  function AfterThrowing(func) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER_THROWING, func);
   }
 
   /**
    * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
    * @param {function(Object, ...)} func
-   * @param {jsAspect.POINTCUT} [pointcut]
    *
    * @class Around
    * @extends Advice
    *
    * @constructor
    */
-  function Around(func, pointcut) {
-    Advice.call(this, pointcut, jsAspect.JOIN_POINT.AROUND, func);
+  function Around(func) {
+    Advice.call(this, jsAspect.JOIN_POINT.AROUND, func);
+  }
+
+  /**
+   * An aspect contains advices and the target to apply the advices to.
+   * Advices can be passed both as an array and specified as arguments to the constructor.
+   * @param {Advice|Advice[]} advices
+   *
+   * @class Aspect
+   * @constructor
+   */
+  function Pointcut(pointcutName, methodRegex) {
+    this.pointcutName = pointcutName;
+    this.methodRegex = methodRegex;
   }
 
   /**
@@ -426,7 +429,21 @@
    */
   function Aspect(advices) {
     this.advices = (advices instanceof Array) ? advices : toArray(arguments);
+    this.pointcut = DEFAULT_POINTCUT;
   }
+
+  /*
+   * Specifies the pointcut to which this aspect will be applied. Once set this pointcut
+   * will be reused for subsequent invokations of <b>applyTo()</b> until a new pointcut
+   * has been set.
+   * @param {jsAspect.POINTCUT} pointcutName
+   * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
+   * @method withPointcut
+   */
+  Aspect.prototype.withPointcut = function(pointcutName, methodRegex) {
+    this.pointcut = new Pointcut(pointcutName, methodRegex);
+    return this;
+  };
 
   /**
    * Applies this Aspect to the given target. If called with several arguments the Aspect
@@ -435,10 +452,12 @@
    * @method applyTo
    */
   Aspect.prototype.applyTo = function() {
+    var self = this;
     var targets = toArray(arguments);
+
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
-        jsAspect.inject(target, advice.pointcut, advice.joinPoint, advice.func);
+        jsAspect.inject(target, self.pointcut.pointcutName, advice.joinPoint, advice.func);
       });
     });
   };
