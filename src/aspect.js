@@ -362,6 +362,15 @@
     return this;
   };
 
+  /*
+   * Specifies the regex for the specified pointcut.
+   * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
+   * @method withRegex
+   */
+  Advice.prototype.withRegex = function(methodRegex) {
+    return this.withPointcut((this.pointcut || DEFAULT_POINTCUT).scope, methodRegex);
+  };
+
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
    * @param {function(Object, ...)} func

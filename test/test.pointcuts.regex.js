@@ -180,5 +180,49 @@ module("jsAspect.SCOPE regex");
     deepEqual(calledMethodNames, ["aabc", "abc"], "Advice was applied using the pointcut defined in advice");
   });
 
-  //TODO: Only a regex on an advice
+  test("jsAspect.Aspect possible to specify only a regex on an advice, then it overrides the pointcut in aspect", function() {
+    function Target() {
+      this.field1 = "";
+      this.field2 = "";
+    }
+
+    Target.prototype.setField1 = function(value) {
+      this.field1 = value;
+    }
+
+    Target.prototype.setField2 = function(value) {
+      this.field2 = value;
+    }
+
+    Target.prototype.getField1 = function() {
+      return this.field1;
+    }
+
+    Target.prototype.getField2 = function() {
+      return this.field2;
+    }
+
+    var calledMethodNames = [];
+
+    var aspect = new jsAspect.Aspect([
+      new jsAspect.Advice.After(function(context) {
+        calledMethodNames.push(context.method.name);
+      }).withRegex("get.*")
+    ]);
+
+    /*
+     * The pointcut is such that the advice would not be applied if it did not
+     * have its own pointcut which is given a higher priority
+     */
+    aspect.withPointcut(jsAspect.SCOPE.METHODS, "getAndSet.*").applyTo(Target);
+
+    var obj = new Target();
+
+    equal(obj.setField1("field1value"), (void 0), "'setField1' executed");
+    equal(obj.getField1(), "field1value", "'getField1' executed");
+    equal(obj.setField2("field2value"), (void 0), "'setField2' executed");
+    equal(obj.getField2(), "field2value", "'getField2' executed");
+
+    deepEqual(calledMethodNames, ["getField1", "getField2"], "Advice was applied only to methods matches by regex");
+  });
 })();
