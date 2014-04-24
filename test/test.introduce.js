@@ -16,7 +16,7 @@ module("jsAspect.introduce");
     equal(Object.staticmethod1, undefined, "Object.staticmethod1");
     equal(Object.prototype.staticmethod1, undefined, "Object.prototype.staticmethod1");
 
-    jsAspect.introduce(Object, jsAspect.POINTCUT.METHODS, {
+    jsAspect.introduce(Object, jsAspect.SCOPE.METHODS, {
       field3: "field3value",
       staticmethod1: function() {
         return "valuefromstaticmethod1";
@@ -43,7 +43,7 @@ module("jsAspect.introduce");
     equal(Object.method2, undefined, "Object.method2");
     equal(Object.prototype.method2, undefined, "Object.prototype.method2");
 
-    jsAspect.introduce(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, {
+    jsAspect.introduce(Object, jsAspect.SCOPE.PROTOTYPE_METHODS, {
       field3: "field3value",
       method2: function() {
         return "valuefrommethod2";
@@ -71,7 +71,7 @@ module("jsAspect.introduce");
 
     Child.prototype.field2 = "field2value";
 
-    jsAspect.introduce(Child, jsAspect.POINTCUT.PROTOTYPE_METHODS, {
+    jsAspect.introduce(Child, jsAspect.SCOPE.PROTOTYPE_METHODS, {
       field1: "field1newvalue",
       field2: "field2newvalue",
       field3: "field3newvalue"

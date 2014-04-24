@@ -14,7 +14,7 @@ module("jsAspect.after");
       return "method2value";
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function afterCallback() {
         var args = [].slice.call(arguments, 1);
 
@@ -36,7 +36,7 @@ module("jsAspect.after");
 
     Target.prototype.field1 = "field1value";
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function afterCallback() {
       }
     );
@@ -62,7 +62,7 @@ module("jsAspect.after");
 
     adviceNames.forEach(function(adviceName) {
       (function (adviceName) {
-        jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+        jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
           function() {
             var args = [].slice.call(arguments, 1);
 
@@ -93,7 +93,7 @@ module("jsAspect.after");
       return "method1value";
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -123,7 +123,7 @@ module("jsAspect.after");
       return "method2value";
     };
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.AFTER,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -148,7 +148,7 @@ module("jsAspect.after");
 
     var obj = new Target();
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function(context) {
         equal(context.method.name, "method1", "method name is passed to 'context' properly");
         deepEqual(context.method.arguments, args, "method arguments are passed to 'context' properly");
@@ -168,18 +168,18 @@ module("jsAspect.after");
 
     var obj = new Target();
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function(context) {
         throw Error("Another 'afterAdvice' should not be applied after 'stop'");
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function(context) {
         ok(true, "One 'after' advice is executed");
         context.stop();
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function afterReturningCallback(retValue) {
         throw Error("'afterReturningAdvice' should not be applied after 'stop'");
       }
@@ -211,7 +211,7 @@ module("jsAspect.after");
       recordedValues.push(context.method.name);
     }).after(Target, function(context) {
       recordedValues.push(context.method.name);
-    }, jsAspect.POINTCUT.METHODS);
+    }, jsAspect.SCOPE.METHODS);
 
     equal(obj.method1(), "method1value", "method1 returns correct value");
     equal(obj.method2(), "method2value", "method2 returns correct value");

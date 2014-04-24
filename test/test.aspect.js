@@ -155,8 +155,8 @@ module("jsAspect.Aspect", {
       })
     ]);
 
-    //Same as aspect.pointcut(jsAspect.POINTCUT.METHODS).applyTo.apply(aspect, objects);
-    aspect.withPointcut(jsAspect.POINTCUT.METHODS).applyTo(objects[0], objects[1], objects[2]);
+    //Same as aspect.pointcut(jsAspect.SCOPE.METHODS).applyTo.apply(aspect, objects);
+    aspect.withPointcut(jsAspect.SCOPE.METHODS).applyTo(objects[0], objects[1], objects[2]);
 
     objects.forEach(function(obj, idx) {
       equal(obj.method(), "methodvalue", "object " + idx + " method successful");
@@ -186,7 +186,7 @@ module("jsAspect.Aspect", {
       })
     );
 
-    aspect.withPointcut(jsAspect.POINTCUT.METHODS).applyTo(obj);
+    aspect.withPointcut(jsAspect.SCOPE.METHODS).applyTo(obj);
 
     equal(obj.method("test"), "methodvalue", "method is called successfully");
 
@@ -254,7 +254,7 @@ module("jsAspect.Aspect", {
     this.called = [];
 
     new jsAspect.Aspect(new jsAspect.Advice.Before(beforeAdvice), new jsAspect.Advice.After(afterAdvice))
-      .withPointcut(jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS)
+      .withPointcut(jsAspect.SCOPE.PROTOTYPE_OWN_METHODS)
       .applyTo(AnotherChild);
 
     var anotherChild = new AnotherChild();

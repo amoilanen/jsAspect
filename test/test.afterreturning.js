@@ -10,7 +10,7 @@ module("jsAspect.afterReturning");
       return {value: value};
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function afterReturningCallback(context, retValue) {
         retValue.value = retValue.value + 1;
         return retValue;
@@ -31,7 +31,7 @@ module("jsAspect.afterReturning");
     };
 
     ["aspect1", "aspect2", "aspect3"].forEach(function (aspectName) {
-      jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
         function afterReturningCallback(context, retValue) {
           return retValue + "_" + aspectName;
         }
@@ -49,7 +49,7 @@ module("jsAspect.afterReturning");
       return num * num;
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING, 
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING, 
       function afterReturningCallback(context, retValue) {
         equal(context.method.name, "square", "method name is passed to 'context' properly");
         deepEqual(context.method.arguments, [3], "method arguments are passed to 'context' properly");
@@ -71,19 +71,19 @@ module("jsAspect.afterReturning");
       return "value";
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function(context, retValue) {
         recordedValues.push("advice1_" + retValue);
         return retValue;
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function(context, retValue) {
         recordedValues.push("advice2_" + retValue);
         return retValue;
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function(context, retValue) {
         context.stop();
         recordedValues.push("advice3_" + retValue);
@@ -123,7 +123,7 @@ module("jsAspect.afterReturning");
     }).afterReturning(Target, function(context, retValue) {
       recordedValues.push(context.method.name);
       return retValue;
-    }, jsAspect.POINTCUT.METHODS);
+    }, jsAspect.SCOPE.METHODS);
 
     equal(obj.method1(), "method1value", "method1 returns correct value");
     equal(obj.method2(), "method2value", "method2 returns correct value");

@@ -16,18 +16,18 @@ module("jsAspect.afterThrowing");
       throw new Error("method2exception");
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function(context) {
         recordedValues.push("after");
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function(context) {
         recordedValues.push("afterReturning");
       }
     );
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
         this.thrownExceptions = this.thrownExceptions || [];
         this.thrownExceptions.push(exception.message);
@@ -62,12 +62,12 @@ module("jsAspect.afterThrowing");
       throw new Error("method2exception");
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
         exception.message = exception.message + "_aspect1"
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
         exception.message = exception.message + "_aspect2"
       }
@@ -95,7 +95,7 @@ module("jsAspect.afterThrowing");
       throw new Error("method1exception");
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
         throw new Error("callbackexception");
       }
@@ -123,7 +123,7 @@ module("jsAspect.afterThrowing");
       throw new Error("method1exception");
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function afterThrowingCallback(context, exception) {
         equal(context.method.name, "method", "method name is passed to 'context' properly");
         deepEqual(context.method.arguments, args, "method arguments are passed to 'context' properly");
@@ -152,17 +152,17 @@ module("jsAspect.afterThrowing");
 
     var recordedValues = [];
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function(context, exception) {
         recordedValues.push("advice1");
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function(context, exception) {
         recordedValues.push("advice2");
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_THROWING,
       function(context, exception) {
         recordedValues.push("advice3");
         context.stop();
@@ -204,7 +204,7 @@ module("jsAspect.afterThrowing");
       recordedValues.push(context.method.name);
     }).afterThrowing(Target, function(context) {
       recordedValues.push(context.method.name);
-    }, jsAspect.POINTCUT.METHODS);
+    }, jsAspect.SCOPE.METHODS);
 
     try {
       obj.method1();

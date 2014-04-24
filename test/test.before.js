@@ -13,7 +13,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(Object, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function beforeCallback() {
         var args = [].slice.call(arguments, 1);
 
@@ -34,7 +34,7 @@ module("jsAspect.before");
     }
     Object.prototype.field1 = "field1value";
 
-    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(Object, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function beforeCallback() {
       }
     );
@@ -59,7 +59,7 @@ module("jsAspect.before");
 
     adviceNames.forEach(function(adviceName) {
       (function (adviceName) {
-        jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
+        jsAspect.inject(Object, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
           function() {
             var args = [].slice.call(arguments, 1);
 
@@ -89,7 +89,7 @@ module("jsAspect.before");
       return "method1value";
     };
 
-    jsAspect.inject(Object, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(Object, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -119,7 +119,7 @@ module("jsAspect.before");
       return "method2value";
     };
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         var args = [].slice.call(arguments, 1);
 
@@ -144,7 +144,7 @@ module("jsAspect.before");
     };
     var calledMethodNames = [];
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function(context) {
         calledMethodNames.push(context.method.name);
       }
@@ -169,18 +169,18 @@ module("jsAspect.before");
       }
     };
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         calledAdviceNames.push("beforeAdvice1");
       }
     );
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function() {
         calledAdviceNames.push("beforeAdvice2");
       }
     );
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE,
       function(context) {
         context.stop();
         calledAdviceNames.push("beforeAdvice3");
@@ -217,12 +217,12 @@ module("jsAspect.before");
 
     var calledClassNames = [];
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
       calledClassNames.push(context.target.constructor.name);
     });
 
     //An example for a own data type.
-    jsAspect.inject(Account, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
+    jsAspect.inject(Account, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.BEFORE, function(context) {
       calledClassNames.push(context.target.constructor.name);
     });
 
@@ -258,7 +258,7 @@ module("jsAspect.before");
       recordedValues.push(context.method.name);
     }).before(Target, function(context) {
       recordedValues.push(context.method.name);
-    }, jsAspect.POINTCUT.METHODS);
+    }, jsAspect.SCOPE.METHODS);
 
     equal(obj.method1(), "method1value", "method1 returns correct value");
     equal(obj.method2(), "method2value", "method2 returns correct value");

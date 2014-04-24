@@ -1,4 +1,4 @@
-module("jsAspect.POINTCUT regex");
+module("jsAspect.SCOPE regex");
 
 (function() {
 
@@ -25,7 +25,7 @@ module("jsAspect.POINTCUT regex");
       })
     ]);
 
-    aspect.withPointcut(jsAspect.POINTCUT.METHODS, "a+bc").applyTo(obj);
+    aspect.withPointcut(jsAspect.SCOPE.METHODS, "a+bc").applyTo(obj);
 
     equal(obj.aabc(), "aabc", "method 'aabc' executed");
     equal(obj.bcd(), "bcd", "method 'bcd' executed");
@@ -58,7 +58,7 @@ module("jsAspect.POINTCUT regex");
       })
     ]);
 
-    aspect.withPointcut(jsAspect.POINTCUT.METHODS).withRegex("a+bc").applyTo(obj);
+    aspect.withPointcut(jsAspect.SCOPE.METHODS).withRegex("a+bc").applyTo(obj);
 
     equal(obj.aabc(), "aabc", "method 'aabc' executed");
     equal(obj.bcd(), "bcd", "method 'bcd' executed");
@@ -91,7 +91,7 @@ module("jsAspect.POINTCUT regex");
       })
     ]);
 
-    aspect.withPointcut(jsAspect.POINTCUT.METHODS).applyTo(obj);
+    aspect.withPointcut(jsAspect.SCOPE.METHODS).applyTo(obj);
 
     equal(obj.aabc(), "aabc", "method 'aabc' executed");
     equal(obj.bcd(), "bcd", "method 'bcd' executed");
@@ -131,7 +131,7 @@ module("jsAspect.POINTCUT regex");
       })
     ]);
 
-    aspect.withPointcut(jsAspect.POINTCUT.PROTOTYPE_METHODS, "get.*").applyTo(Target);
+    aspect.withPointcut(jsAspect.SCOPE.PROTOTYPE_METHODS, "get.*").applyTo(Target);
 
     var obj = new Target();
 

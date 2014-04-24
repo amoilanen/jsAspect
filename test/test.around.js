@@ -14,7 +14,7 @@ module("jsAspect.around");
       return x - 1;
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func, x) {
         return 2 * func(x);
       }
@@ -38,7 +38,7 @@ module("jsAspect.around");
       });
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func) {
         var args = [].slice.call(arguments, 2),
           sum = func.apply(this, args);
@@ -69,19 +69,19 @@ module("jsAspect.around");
       return x - 1;
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 1");
         return 2 * func(x);
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 2");
         return 3 * func(x);
       }
     );
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func, x) {
         equal(obj, this, "'this' is correct in advice 3");
         return 4 * func(x);
@@ -106,7 +106,7 @@ module("jsAspect.around");
       return 2 * x;
     };
 
-    jsAspect.inject(obj, jsAspect.POINTCUT.METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(obj, jsAspect.SCOPE.METHODS, jsAspect.JOIN_POINT.AROUND,
       function aroundCallback(context, func, x) {
         return func(x) - 1;
       }
@@ -129,7 +129,7 @@ module("jsAspect.around");
       return x + y + z;
     };
 
-    jsAspect.inject(Target, jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+    jsAspect.inject(Target, jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function(context, method, x, y, z) {
         equal(context.method.name, "sum", "method name is passed to 'context' properly");
         deepEqual(context.method.arguments, args, "method arguments are passed to 'context' properly");
@@ -156,33 +156,33 @@ module("jsAspect.around");
     };
 
     jsAspect.inject(Target,
-      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
+      jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER,
       function(context, x) {
         recordedValues.push("after");
       }
     );
     jsAspect.inject(Target,
-      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
+      jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AFTER_RETURNING,
       function(context, retValue) {
         recordedValues.push("afterReturning");
       }
     );
     jsAspect.inject(Target,
-      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function(context, func, x) {
         recordedValues.push("around1");
         return 2 * func(x);
       }
     );
     jsAspect.inject(Target,
-      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function(context, func, x) {
         recordedValues.push("around2");
         return 3 * func(x);
       }
     );
     jsAspect.inject(Target,
-      jsAspect.POINTCUT.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
+      jsAspect.SCOPE.PROTOTYPE_METHODS, jsAspect.JOIN_POINT.AROUND,
       function(context, func, x) {
         recordedValues.push("around3");
         context.stop();
@@ -221,7 +221,7 @@ module("jsAspect.around");
     }).around(Target, function(context, func) {
       recordedValues.push(context.method.name);
       return func() + "_advised";
-    }, jsAspect.POINTCUT.METHODS);
+    }, jsAspect.SCOPE.METHODS);
 
     equal(obj.method1(), "method1value_advised", "method1 returns correct value");
     equal(obj.method2(), "method2value_advised", "method2 returns correct value");

@@ -12,11 +12,11 @@
    */
   var jsAspect = {
       /**
-       * All supported pointcuts.
+       * All supported scopes. Scope can be used to define a pointcut.
        * @enum {string}
        * @readonly
        */
-      POINTCUT: {
+      SCOPE: {
         "METHODS": "methods",
         "PROTOTYPE_METHODS": "prototypeMethods",
         "PROTOTYPE_OWN_METHODS": "prototypeOwnMethods",
@@ -38,7 +38,7 @@
     adviceEnhancedFlagName = "__jsAspect_advice_enhanced",
     originalMethodFlagName = "__jsAspect_original_method";
 
-  var DEFAULT_POINTCUT = new Pointcut(jsAspect.POINTCUT.PROTOTYPE_METHODS);
+  var DEFAULT_POINTCUT = new Pointcut(jsAspect.SCOPE.PROTOTYPE_METHODS);
 
   function joinPointName(joinPointId) {
     return joinPointId.toLowerCase().replace(/_[a-z]/, function(match) {
@@ -49,13 +49,14 @@
   /**
    * Extends/Introduces additional properties like fields or function to a passed constructor or object.
    * @param {Function|Object} target The object or constructor that want to be extended
-   * @param {jsAspect.POINTCUT} pointcut Specifies if the properties are introduced to the function's prototype or the function directly (static fields).
+   * @param {jsAspect.SCOPE|Pointcut} pointcut Specifies where the properties are introduced on a target,
+   * as a shortcut jsAspect.SCOPE value can be provided
    * @param {Object} introduction The properties that want to be extended.
    * @method introduce
    * @returns {Object} jsAspect to allow chaining calls
    */
   jsAspect.introduce = function (target, pointcut, introduction) {
-    target = ((jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcut) || (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcut)) ? target.prototype : target;
+    target = ((jsAspect.SCOPE.PROTOTYPE_OWN_METHODS === pointcut) || (jsAspect.SCOPE.PROTOTYPE_METHODS === pointcut)) ? target.prototype : target;
 
     for (var property in introduction) {
       if (introduction.hasOwnProperty(property)) {
@@ -69,7 +70,8 @@
   /**
    * Creates join points at the passed pointcut and advice name.
    * @param {Object|Function} target The target or namespace, which methods want to be intercepted.
-   * @param {jsAspect.POINTCUT} pointcut The pointcut to specify or quantify the join points.
+   * @param {jsAspect.SCOPE|Pointcut} pointcut Specifies where the properties are introduced on a target,
+   * as a shortcut jsAspect.SCOPE value can be provided
    * @param {jsAspect.JOIN_POINT} joinPoint The chosen join point to add the advice code.
    * @param {Function} advice The code, that needs to be executed at the join point.
    * @param {String} [methodName] The name of the method that need to be advised.
@@ -77,12 +79,12 @@
    * @returns {Object} jsAspect to allow chaining calls
    */
   jsAspect.inject = function(target, pointcut, joinPoint, advice, methodName) {
-    var pointcutName = pointcut.pointcutName || pointcut;
+    var scope = pointcut.scope || pointcut;
     var methodRegex = pointcut.methodRegex;
 
-    var isMethodPointcut = (jsAspect.POINTCUT.METHOD === pointcutName);
-    var isPrototypeOwnMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_OWN_METHODS === pointcutName);
-    var isPrototypeMethodsPointcut = (jsAspect.POINTCUT.PROTOTYPE_METHODS === pointcutName);
+    var isMethodPointcut = (jsAspect.SCOPE.METHOD === scope);
+    var isPrototypeOwnMethodsPointcut = (jsAspect.SCOPE.PROTOTYPE_OWN_METHODS === scope);
+    var isPrototypeMethodsPointcut = (jsAspect.SCOPE.PROTOTYPE_METHODS === scope);
 
     if (isMethodPointcut) {
       injectAdvice(target, methodName, advice, joinPoint);
@@ -103,7 +105,7 @@
   keys(jsAspect.JOIN_POINT).forEach(function(joinPoint) {
     jsAspect[joinPointName(joinPoint)] = function(target, advice, pointcut) {
       jsAspect.inject(target,
-        pointcut || jsAspect.POINTCUT.PROTOTYPE_METHODS,
+        pointcut || jsAspect.SCOPE.PROTOTYPE_METHODS,
         jsAspect.JOIN_POINT[joinPoint],
         advice
       );
@@ -420,8 +422,8 @@
    * @class Aspect
    * @constructor
    */
-  function Pointcut(pointcutName, methodRegex) {
-    this.pointcutName = pointcutName;
+  function Pointcut(scope, methodRegex) {
+    this.scope = scope;
     this.methodRegex = methodRegex;
   }
 
@@ -442,12 +444,12 @@
    * Specifies the pointcut to which this aspect will be applied. Once set this pointcut
    * will be reused for subsequent invokations of <b>applyTo()</b> until a new pointcut
    * has been set.
-   * @param {jsAspect.POINTCUT} pointcutName
+   * @param {jsAspect.SCOPE} scope
    * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
    * @method withPointcut
    */
-  Aspect.prototype.withPointcut = function(pointcutName, methodRegex) {
-    this.pointcut = new Pointcut(pointcutName, new RegExp(methodRegex));
+  Aspect.prototype.withPointcut = function(scope, methodRegex) {
+    this.pointcut = new Pointcut(scope, new RegExp(methodRegex));
     return this;
   };
 
@@ -457,7 +459,7 @@
    * @method withRegex
    */
   Aspect.prototype.withRegex = function(methodRegex) {
-    return this.withPointcut(this.pointcut.pointcutName, methodRegex);
+    return this.withPointcut(this.pointcut.scope, methodRegex);
   };
 
   /**
