@@ -142,4 +142,43 @@ module("jsAspect.SCOPE regex");
 
     deepEqual(calledMethodNames, ["getField1", "getField2"], "Advice was applied only to methods matches by regex");
   });
+
+  test("jsAspect.Aspect possible to define pointcut on advice, then it overrides the settings of the aspect", function() {
+    var obj = {
+      aabc: function() {
+        return "aabc";
+      },
+      bcd: function() {
+        return "bcd";
+      },
+      abc: function() {
+        return "abc";
+      },
+      bc: function() {
+        return "bc";
+      }
+    };
+    var calledMethodNames = [];
+
+    var aspect = new jsAspect.Aspect([
+      new jsAspect.Advice.Before(function(context) {
+        calledMethodNames.push(context.method.name);
+      }).withPointcut(jsAspect.SCOPE.METHODS, "a+bc")
+    ]);
+
+    /*
+     * The pointcut is such that the advice would not be applied if it did not
+     * have its own pointcut which is given a higher priority
+     */
+    aspect.withPointcut(jsAspect.SCOPE.PROTOTYPE_METHODS, "dddd").applyTo(obj);
+
+    equal(obj.aabc(), "aabc", "method 'aabc' executed");
+    equal(obj.bcd(), "bcd", "method 'bcd' executed");
+    equal(obj.abc(), "abc", "method 'abc' executed");
+    equal(obj.bc(), "bc", "method 'bc' executed");
+
+    deepEqual(calledMethodNames, ["aabc", "abc"], "Advice was applied using the pointcut defined in advice");
+  });
+
+  //TODO: Only a regex on an advice
 })();

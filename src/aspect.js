@@ -347,7 +347,20 @@
   function Advice(joinPoint, func) {
     this.joinPoint = joinPoint;
     this.func = func;
+    this.pointcut = null;
   }
+
+  /*
+   * Specifies the default pointcut for an <b>Advice</b>. It will override the pointcut defined
+   * in an <b>Aspect</b> as part of which this <b>Advice</b> has been defined.
+   * @param {jsAspect.SCOPE} scope
+   * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
+   * @method withPointcut
+   */
+  Advice.prototype.withPointcut = function(scope, methodRegex) {
+    this.pointcut = new Pointcut(scope, new RegExp(methodRegex));
+    return this;
+  };
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
@@ -362,6 +375,8 @@
      Advice.call(this, jsAspect.JOIN_POINT.BEFORE, func);
   }
 
+  Before.prototype = new Advice();
+
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
    * @param {function(Object, ...)} func
@@ -374,6 +389,8 @@
   function After(func) {
     Advice.call(this, jsAspect.JOIN_POINT.AFTER, func);
   }
+
+  After.prototype = new Advice();
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
@@ -388,6 +405,8 @@
     Advice.call(this, jsAspect.JOIN_POINT.AFTER_RETURNING, func);
   }
 
+  AfterReturning.prototype = new Advice();
+
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
    * @param {function(Object, ...)} func
@@ -401,6 +420,8 @@
     Advice.call(this, jsAspect.JOIN_POINT.AFTER_THROWING, func);
   }
 
+  AfterThrowing.prototype = new Advice();
+
   /**
    * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
    * @param {function(Object, ...)} func
@@ -413,6 +434,8 @@
   function Around(func) {
     Advice.call(this, jsAspect.JOIN_POINT.AROUND, func);
   }
+
+  Around.prototype = new Advice();
 
   /**
    * An aspect contains advices and the target to apply the advices to.
@@ -474,7 +497,7 @@
 
     this.advices.forEach(function(advice) {
       targets.forEach(function(target) {
-        jsAspect.inject(target, self.pointcut, advice.joinPoint, advice.func);
+        jsAspect.inject(target, advice.pointcut || self.pointcut, advice.joinPoint, advice.func);
       });
     });
   };
@@ -521,6 +544,7 @@
     AfterThrowing: AfterThrowing,
     Around: Around
   };
+  jsAspect.Pointcut = Pointcut;
   jsAspect.Aspect = Aspect;
   host.jsAspect = jsAspect;
 })(this);
