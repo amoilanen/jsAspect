@@ -3,6 +3,10 @@ jsAspect
 
 Aspect-oriented framework for JavaScript
 
+>In computing, aspect-oriented programming (AOP) is a programming paradigm that aims to increase modularity by allowing the separation of cross-cutting concerns. AOP forms a basis for aspect-oriented software development.
+
+>AOP includes programming methods and tools that support the modularization of concerns at the level of the source code, while "aspect-oriented software development" refers to a whole engineering discipline. (Source: [Wikipedia](http://en.wikipedia.org/wiki/Aspect-oriented_programming))
+
 ## Installation
 To install the library just use bower:
 
