@@ -170,11 +170,11 @@ For this case, you can make use of the function `withRegex` (same functionality 
 ``` javascript
 aspect.withRegex("get.*").applyTo(Target);
 ```
-Will match for all methods containing __get__: __get__ Data, some __get__ terMethod
+Will match for all methods containing __get__: getData, some getterMethod
 ``` javascript
 aspect.withRegex(".*Target.*").applyTo(Target);
 ```
-Wil match for: set __Target__, get __Target__ , printAll __Target__ s.
+Wil match for: setTarget, getTarget, printAllTargets.
 ### The `context` parameter
 The `context` parameter is passed to all advices. It provides information about the adviced method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
 
