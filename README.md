@@ -27,11 +27,11 @@ Or download the minified file in the _dist_ folder.
 `jsAspect.JOIN_POINT`: Contains all available join points.
 
 >Currently supported ***join points***:
-- `BEFORE`: Will be executed before the adviced method.
-- `AFTER_THROWING`: Will be executed after the adviced method thrown an error.
-- `AFTER_RETURNING`: Will be executed after the adviced method returned a value.
-- `AFTER`: Will be executed after the adviced method.
-- `AROUND`: Will be executed instead of the adviced method, the original function and its arguments will be passed as arguments to the advice so that the original function can be executed inside the advice.
+- `BEFORE`: Will be executed before the advised method.
+- `AFTER_THROWING`: Will be executed after the advised method thrown an error.
+- `AFTER_RETURNING`: Will be executed after the advised method returned a value.
+- `AFTER`: Will be executed after the advised method.
+- `AROUND`: Will be executed instead of the advised method, the original function and its arguments will be passed as arguments to the advice so that the original function can be executed inside the advice.
 
 `jsAspect.SCOPE`: Contains all available SCOPES.
 
@@ -180,7 +180,7 @@ aspect.withRegex(".*Target.*").applyTo(Target);
 ```
 Wil match for: setTarget, getTarget, printAllTargets.
 ### The `context` parameter
-The `context` parameter is passed to all advices. It provides information about the adviced method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
+The `context` parameter is passed to all advices. It provides information about the advised method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
 
 Usage:
 
