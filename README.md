@@ -3,6 +3,10 @@ jsAspect
 
 Aspect-oriented framework for JavaScript
 
+>In computing, aspect-oriented programming (AOP) is a programming paradigm that aims to increase modularity by allowing the separation of cross-cutting concerns. AOP forms a basis for aspect-oriented software development.
+
+>AOP includes programming methods and tools that support the modularization of concerns at the level of the source code, while "aspect-oriented software development" refers to a whole engineering discipline. (Source: [Wikipedia](http://en.wikipedia.org/wiki/Aspect-oriented_programming))
+
 ## Installation
 To install the library just use bower:
 
@@ -23,20 +27,21 @@ Or download the minified file in the _dist_ folder.
 `jsAspect.JOIN_POINT`: Contains all available join points.
 
 >Currently supported ***join points***:
-- `BEFORE`: Will be executed before the adviced method.
-- `AFTER_THROWING`: Will be executed after the adviced method thrown an error.
-- `AFTER_RETURNING`: Will be executed after the adviced method returned a value.
-- `AFTER`: Will be executed after the adviced method.
-- `AROUND`: Will be executed instead of the adviced method, the original function and its arguments will be passed as arguments to the advice so that the original function can be executed inside the advice.
+- `BEFORE`: Will be executed before the advised method.
+- `AFTER_THROWING`: Will be executed after the advised method thrown an error.
+- `AFTER_RETURNING`: Will be executed after the advised method returned a value.
+- `AFTER`: Will be executed after the advised method.
+- `AROUND`: Will be executed instead of the advised method, the original function and its arguments will be passed as arguments to the advice so that the original function can be executed inside the advice.
 
-`jsAspect.POINTCUT`: Contains all available pointcuts.
+`jsAspect.SCOPE`: Contains all available SCOPES.
 
->Currently supported ***pointcuts***:
+>Currently supported ***scopes***:
 - `PROTOTYPE_METHODS`: *Default* Intercepts all prototype methods (even inherited)
 - `METHODS`: To advice object methods, instead of prototype methods
 - `PROTOTYPE_OWN_METHODS`: Like `prototype_methods` without inherited methods.
 - `METHOD` : To advice just one method of an object.
 
+In javascript we need scopes, to define if we want to intercept prototype or object methods.
 
 ## Usage
 
@@ -53,7 +58,17 @@ var beforeAdvice = new jsAspect.Advice.Before(function() {
 In this example we defined two advices, a `before` and an `after` advice.
 
 By default the advices will be using the `pointcut` `PROTOTYPE_METHODS`.
-
+#### Using regular expressions to select methods (pointcut)
+To apply an advice to a subset of methods, you also could use regular expressions.
+In the following example, we want to apply an advice to all getters and a before advice to our setters.
+``` javascript
+var afterReturningAdvice =  new jsAspect.Advice.AfterReturning(function() {
+  console.log("joinPoint", "afterReturning");
+}).withRegex("get.*");
+var beforeAdvice = new jsAspect.Advice.Before(function() {
+  console.log("joinPoint", "before");
+}).withRegex("set.*");
+```
 ### Define Aspect
 Up next we need to define a `Aspect`.
 ``` javascript
@@ -122,7 +137,7 @@ Works by default. To turn off, use the pointcut `PROTOTYPE_OWN_METHODS`.
 If you still want to advice methods that are directly placed on the created object in a constructor, you can apply your `Aspect` to each object created with this constructor.
 
 ### Apply Aspect to methods set in constructor
-To apply an `Aspect` to an object, you have to change the *pointcuts* at the advices, to advice the objects methods `METHODS`, instead of it's prototype methods `PROTOTYPE_OWN_METHODS` which is used by default.
+To apply an `Aspect` to an object, you have to change the *scopes* at the advices, to advice the objects methods `METHODS`, instead of it's prototype methods `PROTOTYPE_OWN_METHODS` which is used by default.
 ``` javascript
 //Define behaviour of the afterAdvice
 var afterAdviceBehaviour = function() {
@@ -152,9 +167,20 @@ target.method1();
 
 //logs: `joinPoint after`
 //logs: `joinPoint before`
-``` 
+```
+### Apply an aspect using a regular expression
+Sometimes you want to apply all your advices to a subset of methods within a object or constructor.
+For this case, you can make use of the function `withRegex` (same functionality as at advices).
+``` javascript
+aspect.withRegex("get.*").applyTo(Target);
+```
+Will match for all methods containing __get__: getData, some getterMethod
+``` javascript
+aspect.withRegex(".*Target.*").applyTo(Target);
+```
+Wil match for: setTarget, getTarget, printAllTargets.
 ### The `context` parameter
-The `context` parameter is passed to all advices. It provides information about the adviced method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
+The `context` parameter is passed to all advices. It provides information about the advised method itself and the object/constructor the aspect was applied to. Also it contains API to control the execution of the method to which the advice was applied. This is useful, for example, if you're building a logger aspect.
 
 Usage:
 
