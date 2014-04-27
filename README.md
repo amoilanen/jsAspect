@@ -1,4 +1,4 @@
-jsAspect
+jsAspect [![Build Status](https://travis-ci.org/antivanov/jsAspect.svg?branch=master)](https://travis-ci.org/antivanov/jsAspect)
 ========
 
 Aspect-oriented framework for JavaScript
