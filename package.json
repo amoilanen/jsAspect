@@ -1,5 +1,5 @@
 {
-  "name": "jsAspect",
+  "name": "js-aspect",
   "version": "0.5.0",
   "description": "Aspect-oriented framework for JavaScript",
   "files": [
@@ -21,27 +21,28 @@
     "aop",
     "javascript"
   ],
-  "author": {
-    "name": "Anton Ivanov",
-    "email": "anton.al.ivanov@gmail.com",
-    "url": "https://github.com/antivanov"
-  },
+  "author": "Anton Ivanov <anton.al.ivanov@gmail.com> (https://github.com/antivanov)",
   "contributors": [
-    {
-      "name": "Konstantin Krassmann",
-      "email": "kkonstantin@gmx.de",
-      "url": "https://github.com/konstantinkrassmann"
-    }
+    "Konstantin Krassmann <kkonstantin@gmx.de> (https://github.com/konstantinkrassmann)"
   ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/antivanov/jsAspect/issues"
   },
   "devDependencies": {
-    "bower": "*",
-    "grunt": "*",
-    "grunt-contrib-uglify": "*",
-    "grunt-contrib-qunit": "*",
-    "grunt-contrib-jshint": "*"
+    "grunt": "~0.4.4",
+    "grunt-contrib-jshint": "~0.10.0",
+    "grunt-contrib-qunit": "~0.4.0",
+    "grunt-contrib-uglify": "~0.4.0",
+    "bower": "~1.3.2"
+  },
+  "homepage": "https://github.com/antivanov/jsAspect",
+  "main": "src/aspect",
+  "directories": {
+    "example": "examples",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "test"
   }
 }

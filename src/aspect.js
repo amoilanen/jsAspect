@@ -555,5 +555,10 @@
   };
   jsAspect.Pointcut = Pointcut;
   jsAspect.Aspect = Aspect;
-  host.jsAspect = jsAspect;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = jsAspect;
+  } else {
+    host.jsAspect = jsAspect;
+  }
 })(this);

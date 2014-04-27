@@ -1,10 +1,9 @@
-//TODO: Add a separate file that will export a Node module and require the library itself like in https://github.com/antivanov/grunt-prepr/blob/master/tasks/prepr-grunt.js
-
-//TODO: Add the ability to configure pointcut on the aspect level, so that the setting
-for Aspect will override that of an Advice
+//TODO: Add a test that a regex specified for a Pointcut is ignored for jsAspect.introduce
 
 //TODO: Run jshint on also the test files and correct the warnings
+
 //TODO: Properly format the source code for tests like already done for test.before.js
+
 
 //TODO: Add error handling
 //TODO: Add an example of an aspect itself having an aspect injected to the tests
