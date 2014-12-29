@@ -341,19 +341,23 @@
    * Generic advice class.
    * @param {JOIN_POINT} joinPoint
    * @param {function(Object, ...)} func
+   * @param {jsAspect.SCOPE} scope optional scope
    * @class Advice
    * @constructor
    */
-  function Advice(joinPoint, func) {
+  function Advice(joinPoint, func, scope) {
     this.joinPoint = joinPoint;
     this.func = func;
     this.pointcut = null;
+    if (scope) {
+      this.withPointcut(scope);
+    }
   }
 
   /*
    * Specifies the default pointcut for an <b>Advice</b>. It will override the pointcut defined
    * in an <b>Aspect</b> as part of which this <b>Advice</b> has been defined.
-   * @param {jsAspect.SCOPE} scope
+scope
    * @param {String} methodRegex regular expression that specifies which methods the pointcut should match
    * @method withPointcut
    */
@@ -374,20 +378,22 @@
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>before</i> join point.
    * @param {function(Object, ...)} func
+   * @param {jsAspect.SCOPE} scope optional scope
    *
    * @class Before
    * @extends Advice
    *
    * @constructor
    */
-  function Before(func) {
-     Advice.call(this, jsAspect.JOIN_POINT.BEFORE, func);
+  function Before(func, scope) {
+     Advice.call(this, jsAspect.JOIN_POINT.BEFORE, func, scope);
   }
 
   Before.prototype = new Advice();
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>after</i> join point.
+   * @param {jsAspect.SCOPE} scope optional scope
    * @param {function(Object, ...)} func
    *
    * @class After
@@ -395,14 +401,15 @@
    *
    * @constructor
    */
-  function After(func) {
-    Advice.call(this, jsAspect.JOIN_POINT.AFTER, func);
+  function After(func, scope) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER, func, scope);
   }
 
   After.prototype = new Advice();
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterReturning</i> join point.
+   * @param {jsAspect.SCOPE} scope optional scope
    * @param {function(Object, ...)} func
    *
    * @class AfterReturning
@@ -410,14 +417,15 @@
    *
    * @constructor
    */
-  function AfterReturning(func) {
-    Advice.call(this, jsAspect.JOIN_POINT.AFTER_RETURNING, func);
+  function AfterReturning(func, scope) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER_RETURNING, func, scope);
   }
 
   AfterReturning.prototype = new Advice();
 
   /**
    * This advice is a child of the Advice class. It defines the behaviour for a <i>afterThrowing</i> join point.
+   * @param {jsAspect.SCOPE} scope optional scope
    * @param {function(Object, ...)} func
    *
    * @class AfterThrowing
@@ -425,14 +433,15 @@
    *
    * @constructor
    */
-  function AfterThrowing(func) {
-    Advice.call(this, jsAspect.JOIN_POINT.AFTER_THROWING, func);
+  function AfterThrowing(func, scope) {
+    Advice.call(this, jsAspect.JOIN_POINT.AFTER_THROWING, func, scope);
   }
 
   AfterThrowing.prototype = new Advice();
 
   /**
    * This advice is a child of the Around class. It defines the behaviour for a <i>around</i> join point.
+   * @param {jsAspect.SCOPE} scope optional scope
    * @param {function(Object, ...)} func
    *
    * @class Around
@@ -440,8 +449,8 @@
    *
    * @constructor
    */
-  function Around(func) {
-    Advice.call(this, jsAspect.JOIN_POINT.AROUND, func);
+  function Around(func, scope) {
+    Advice.call(this, jsAspect.JOIN_POINT.AROUND, func, scope);
   }
 
   Around.prototype = new Advice();
