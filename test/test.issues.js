@@ -1,4 +1,4 @@
-module("jsAspect.afterReturning", {
+module("jsAspect.issues", {
   setup: function() {
     this.logged = [];
   }
